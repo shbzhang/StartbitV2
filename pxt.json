@@ -4,7 +4,8 @@
     "description": "Blocks for Hiwonder StartbitV2",
     "license": "MIT",
     "dependencies": {
-        "core": "*"
+        "core": "*",
+        "RGBSonar": "github.com/Hiwonder/RGBSonar#v0.0.1"
     },
     "files": [
         "README.md",
