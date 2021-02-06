@@ -1422,6 +1422,7 @@ namespace StartbitV2 {
             distance = distanceBak;
         }
         distanceBak = d;
+        
         return Math.round(distance * 10 / 6 / 58 / 1.6);
     }
 
