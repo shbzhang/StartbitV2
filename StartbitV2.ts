@@ -519,7 +519,7 @@ namespace StartbitV2 {
     //% weight=100 blockId=setServo block="Set pwm servo range %range|index %index|angle %angle|duration %duration"
     //% angle.min=0 angle.max=270
     //% inlineInputMode=inline
-    //% subcategory=Servo
+    //% subcategory=Servo/Motor
     export function setPwmServo(range:startbit_servorange, index: number = 1, angle: number, duration: number = 300) {
 	    
         let position = mapRGB(angle, 0, range, 500, 2500);
@@ -545,7 +545,7 @@ namespace StartbitV2 {
     //% weight=98 blockId=setBusServo blockGap=50 block="Set bus servo index %index|angle %angle|duration %duration"
     //% angle.min=0 angle.max=240
     //% inlineInputMode=inline
-    //% subcategory=Servo
+    //% subcategory=Servo/Motor
     export function setBusServo(index: number = 1, angle: number = 135, duration: number = 500) {
 
         let position = mapRGB(angle, 0, 240, 0, 1000);
@@ -570,7 +570,7 @@ namespace StartbitV2 {
     * @param times Running times. eg: 1
     */
     //% weight=94 blockId=startbit_runActionGroup block="Run ActionGroup|index %index|times %times"
-    //% subcategory=Servo
+    //% subcategory=Servo/Motor
     export function startbit_runActionGroup(index: number, times: number = 1) {
 
         let buf = pins.createBuffer(7);
@@ -590,7 +590,7 @@ namespace StartbitV2 {
     * Stop running actiongroup
     */
     //% weight=92 blockId=startbit_stopnActionGroup block="Stop ActionGroup"
-    //% subcategory=Servo
+    //% subcategory=Servo/Motor
     export function startbit_stopActionGroup() {
 
         let buf = pins.createBuffer(7);
@@ -607,7 +607,7 @@ namespace StartbitV2 {
      * Wait for Actiongroup Finishing
      */
     //% weight=93 blockId=startbit_actionRunover block="Action run over"
-    //% subcategory=Servo
+    //% subcategory=Servo/Motor
     export function startbit_actionRunover(): boolean {
         // let ret = false;
         if (actiongroup_finished == true) {
@@ -625,7 +625,7 @@ namespace StartbitV2 {
 //      * Send read startbit servos angle command
 //      */
 //     //% weight=99 blockId=startbit_readAngle block="Send |%servo|angle command "
-//     //% subcategory=Servo
+//     //% subcategory=Servo/Motor
 //     export function startbit_readAngle(servo: startbit_Servos) {
 //         let buf = pins.createBuffer(6);
 //         buf[0] = 0x55;
@@ -643,7 +643,7 @@ namespace StartbitV2 {
 //      * @param body code to run when event is raised
 //      */
 //     //% weight=97 blockId=onStartbit_getAngle blockGap=50 block="on Startbit|%servo|get angle"
-//     //% subcategory=Servo
+//     //% subcategory=Servo/Motor
 //     export function onStartbit_getAngle(servo: startbit_Servos, body: Action) {
 //         control.onEvent(MESSAGE_ANGLE, servo, body);
 //     }
@@ -653,7 +653,7 @@ namespace StartbitV2 {
 //      *  Get servos angle
 //      */
 //     //% weight=98 blockId=getServosAngle block="Get|%servo|angle(-120~120)"
-//     //% subcategory=Servo
+//     //% subcategory=Servo/Motor
 //     export function getServosAngle(servo: startbit_Servos): number {
 //         if (servo == startbit_Servos.Servo1) {
 //             return servo1Angle;
@@ -695,7 +695,7 @@ namespace StartbitV2 {
     //% weight=96 blockId=startbit_setMotorSpeed block="Set motor1 speed(-100~100)|%speed1|and motor2|speed %speed2"
     //% speed1.min=-100 speed1.max=100
     //% speed2.min=-100 speed2.max=100
-    //% subcategory=Servo
+    //% subcategory=Servo/Motor
     export function startbit_setMotorSpeed(speed1: number, speed2: number) {
         if (speed1 > 100 || speed1 < -100 || speed2 > 100 || speed2 < -100) {
             return;
@@ -717,7 +717,7 @@ namespace StartbitV2 {
     */
     //% weight=95 blockId=startbit_setFanSpeed blockGap=50 block="Set fan speed(-100~100)|%speed1"
     //% speed1.min=-100 speed1.max=100
-    //% subcategory=Servo
+    //% subcategory=Servo/Motor
     export function startbit_setFanSpeed(speed1: number) {
         if (speed1 > 100 || speed1 < -100) {
             return;
