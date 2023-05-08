@@ -1468,9 +1468,13 @@ namespace StartbitV2 {
     }
 	
     /**
-	 * Initialize RGB
-	 */
-    function startbit_initRGBLight() {
+         * Set the brightness of the strip. This flag only applies to future operation.
+         * @param brightness a measure of LED brightness in 0-255. eg: 255
+    */
+    //% blockId="init_led" block="Initialize RGB led"
+    //% weight=100
+    //% subcategory=LED
+   export function startbit_initRGBLight() {
         if (!lhRGBLight) {
             lhRGBLight = StartbitRGBLight.create(DigitalPin.P15, 6, StartbitRGBPixelMode.RGB);
         }
@@ -1482,7 +1486,7 @@ namespace StartbitV2 {
          * @param brightness a measure of LED brightness in 0-255. eg: 255
     */
     //% blockId="startbit_setBrightness" block="set brightness %brightness"
-    //% weight=100
+    //% weight=99
     //% subcategory=LED
     export function startbit_setBrightness(brightness: number): void {
         lhRGBLight.setBrightness(brightness);
@@ -1501,7 +1505,7 @@ namespace StartbitV2 {
     /**
      * Set RGB Color argument
      */
-    //% weight=99 blockId=startbit_setPixelRGBArgs block="Set|%lightoffset|color to %rgb"
+    //% weight=97 blockId=startbit_setPixelRGBArgs block="Set|%lightoffset|color to %rgb"
     //% subcategory=LED
     export function startbit_setPixelRGBArgs(lightoffset: StartbitLights, rgb: number) {
         lhRGBLight.setPixelColor(lightoffset, rgb);
@@ -1511,7 +1515,7 @@ namespace StartbitV2 {
     /**
      * Display the colored lights, and set the color of the colored lights to match the use. After setting the color of the colored lights, the color of the lights must be displayed.
      */
-    //% weight=97 blockId=startbit_showLight block="Show light"
+    //% weight=96 blockId=startbit_showLight block="Show light"
     //% subcategory=LED
     export function startbit_showLight() {
         lhRGBLight.show();
@@ -1520,7 +1524,7 @@ namespace StartbitV2 {
     /**
      * Clear the color of the colored lights and turn off the lights.
      */
-    //% weight=96 blockGap=50 blockId=startbit_clearLight block="Clear light"
+    //% weight=95 blockGap=50 blockId=startbit_clearLight block="Clear light"
     //% subcategory=LED
     export function startbit_clearLight() {
         lhRGBLight.clear();
@@ -1529,7 +1533,7 @@ namespace StartbitV2 {
     /**
 	 * Initialize Light belt
 	 */
-    //% weight=97 blockId=startbit_belt_initRGBLight block="Initialize light belt at port %port"
+    //% weight=94 blockId=startbit_belt_initRGBLight block="Initialize light belt at port %port"
     export function startbit_belt_initRGBLight(port: startbit_ultrasonicPort) {
         switch (port) {
             case startbit_ultrasonicPort.port1:
@@ -1550,7 +1554,7 @@ namespace StartbitV2 {
     /**
      * Set the color of the colored lights, after finished the setting please perform  the display of colored lights.
      */
-    //% weight=95 blockId=startbit_belt_setPixelRGB block="Set light belt|%lightoffset|color to %rgb"
+    //% weight=93 blockId=startbit_belt_setPixelRGB block="Set light belt|%lightoffset|color to %rgb"
     //% subcategory=LED
     export function startbit_belt_setPixelRGB(lightoffset: StartbitLightsBelt, rgb: StartbitRGBColors) {
         lhRGBLightBelt.setPixelColor(lightoffset, rgb);
@@ -1559,7 +1563,7 @@ namespace StartbitV2 {
     /**
      * Display the colored lights, and set the color of the colored lights to match the use. After setting the color of the colored lights, the color of the lights must be displayed.
      */
-    //% weight=94 blockId=startbit_belt_showLight block="Show light belt"
+    //% weight=92 blockId=startbit_belt_showLight block="Show light belt"
     //% subcategory=LED
     export function startbit_belt_showLight() {
         lhRGBLightBelt.show();
@@ -1568,7 +1572,7 @@ namespace StartbitV2 {
     /**
      * Clear the color of the colored lights and turn off the lights.
      */
-    //% weight=93 blockGap=50 blockId=startbit_belt_clearLight block="Clear light belt"
+    //% weight=91 blockGap=50 blockId=startbit_belt_clearLight block="Clear light belt"
     //% subcategory=LED
     export function startbit_belt_clearLight() {
         lhRGBLightBelt.clear();
