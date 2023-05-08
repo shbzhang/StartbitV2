@@ -10,6 +10,7 @@
 	"StartbitV2.ASR_init|block":"初始化语音识别模块|%port",
 	"StartbitV2.lineFollow_iic_init|block":"初始化四路巡线传感器|%port",
 	"StartbitV2.avoidSensor_init|block":"初始化避障传感器|%port",
+	"StartbitV2.init_led|block":"初始化彩灯",
 
 	"StartbitV2.startbit_iic.port3|block":"接口3",
 	"StartbitV2.startbit_iic.port4|block":"接口4",
