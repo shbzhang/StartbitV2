@@ -1467,10 +1467,7 @@ namespace StartbitV2 {
         return flag;
     }
 	
-    /**
-         * Set the brightness of the strip. This flag only applies to future operation.
-         * @param brightness a measure of LED brightness in 0-255. eg: 255
-    */
+
     //% blockId="init_led" block="Initialize RGB led"
     //% weight=100
     //% subcategory=LED
