@@ -1468,7 +1468,7 @@ namespace StartbitV2 {
     }
 	
 
-    //% blockId="init_led" block="Initialize RGB led"
+    //% blockId="startbit_initRGBLight" block="Initialize RGB led"
     //% weight=100
     //% subcategory=LED
    export function startbit_initRGBLight() {
