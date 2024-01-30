@@ -564,6 +564,31 @@ namespace StartbitV2 {
         serial.writeBuffer(buf);
         basic.pause(1);
     }
+
+    /**
+    * Set the speed of servo 1 to 6, range of 0~270 degree
+    */
+    //% weight=96 blockId=setLogoServo block="Set logo 360° servo index %index speed %speed"
+    //% speed.min=-180 speed.max=180
+    //% inlineInputMode=inline
+    //% subcategory=Servo/Motor
+    export function setLogoServo(index: number = 1, speed: number) {
+        speed += 180;
+        let position = mapRGB(speed, 0, 360, 500, 2500);
+        let buf = pins.createBuffer(10);
+        buf[0] = 0x55;
+        buf[1] = 0x55;
+        buf[2] = 0x08;
+        buf[3] = 0x03;//cmd type
+        buf[4] = 0x01;
+        buf[5] = 100 & 0xff;
+        buf[6] = (100 >> 8) & 0xff;
+        buf[7] = index;
+        buf[8] = position & 0xff;
+        buf[9] = (position >> 8) & 0xff;
+        serial.writeBuffer(buf);
+        basic.pause(1);
+    }
 	
     /**
     * Set the servo controller to run a actiongroup
