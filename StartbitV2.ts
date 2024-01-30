@@ -568,7 +568,7 @@ namespace StartbitV2 {
     /**
     * Set the speed of servo 1 to 6, range of 0~270 degree
     */
-    //% weight=96 blockId=setLogoServo block="Set logo 360° servo index %index speed %speed"
+    //% weight=97 blockId=setLogoServo block="Set logo 360° servo index %index speed %speed"
     //% speed.min=-180 speed.max=180
     //% inlineInputMode=inline
     //% subcategory=Servo/Motor
@@ -588,6 +588,55 @@ namespace StartbitV2 {
         buf[9] = (position >> 8) & 0xff;
         serial.writeBuffer(buf);
         basic.pause(1);
+    }
+
+     /**
+    *	Set the speed of the number 1 motor and number 2 motor, range of -100~100, that can control the tank to go advance or turn of.
+    */
+    //% weight=96 blockId=startbit_setMotorSpeed block="Set motor1 speed(-100~100)|%speed1|and motor2|speed %speed2"
+    //% speed1.min=-100 speed1.max=100
+    //% speed2.min=-100 speed2.max=100
+    //% subcategory=Servo/Motor
+    export function startbit_setMotorSpeed(speed1: number, speed2: number) {
+        if (speed1 > 100 || speed1 < -100 || speed2 > 100 || speed2 < -100) {
+            return;
+        }
+        speed1 = speed1 * -1;
+        speed2 = speed2 * -1;
+        let buf = pins.createBuffer(6);
+        buf[0] = 0x55;
+        buf[1] = 0x55;
+        buf[2] = 0x04;
+        buf[3] = 0x32;//cmd type
+        buf[4] = speed1;
+        buf[5] = speed2;
+        serial.writeBuffer(buf);
+    }
+
+    /**
+    *	Set the speed of the fan, range of -100~100.
+    */
+    //% weight=95 blockId=startbit_setFanSpeed blockGap=50 block="Set fan speed(-100~100)|%speed1"
+    //% speed1.min=-100 speed1.max=100
+    //% subcategory=Servo/Motor
+    export function startbit_setFanSpeed(speed1: number) {
+        if (speed1 > 100 || speed1 < -100) {
+            return;
+        }
+
+        if (speed1 < 0) {
+            pins.analogWritePin(fanPin2, 0);
+            pins.analogWritePin(fanPin1, pins.map(-speed1, 0, 100, 0, 1023));
+        }
+        else if (speed1 > 0) {
+            pins.analogWritePin(fanPin1, 0);
+            pins.analogWritePin(fanPin2, pins.map(speed1, 0, 100, 0, 1023));
+        }
+        else {
+            pins.analogWritePin(fanPin2, 0);
+            pins.analogWritePin(fanPin1, 0);
+        }
+
     }
 	
     /**
@@ -714,54 +763,7 @@ namespace StartbitV2 {
     }
     */
 	
-    /**
-    *	Set the speed of the number 1 motor and number 2 motor, range of -100~100, that can control the tank to go advance or turn of.
-    */
-    //% weight=96 blockId=startbit_setMotorSpeed block="Set motor1 speed(-100~100)|%speed1|and motor2|speed %speed2"
-    //% speed1.min=-100 speed1.max=100
-    //% speed2.min=-100 speed2.max=100
-    //% subcategory=Servo/Motor
-    export function startbit_setMotorSpeed(speed1: number, speed2: number) {
-        if (speed1 > 100 || speed1 < -100 || speed2 > 100 || speed2 < -100) {
-            return;
-        }
-        speed1 = speed1 * -1;
-        speed2 = speed2 * -1;
-        let buf = pins.createBuffer(6);
-        buf[0] = 0x55;
-        buf[1] = 0x55;
-        buf[2] = 0x04;
-        buf[3] = 0x32;//cmd type
-        buf[4] = speed1;
-        buf[5] = speed2;
-        serial.writeBuffer(buf);
-    }
-
-    /**
-    *	Set the speed of the fan, range of -100~100.
-    */
-    //% weight=95 blockId=startbit_setFanSpeed blockGap=50 block="Set fan speed(-100~100)|%speed1"
-    //% speed1.min=-100 speed1.max=100
-    //% subcategory=Servo/Motor
-    export function startbit_setFanSpeed(speed1: number) {
-        if (speed1 > 100 || speed1 < -100) {
-            return;
-        }
-
-        if (speed1 < 0) {
-            pins.analogWritePin(fanPin2, 0);
-            pins.analogWritePin(fanPin1, pins.map(-speed1, 0, 100, 0, 1023));
-        }
-        else if (speed1 > 0) {
-            pins.analogWritePin(fanPin1, 0);
-            pins.analogWritePin(fanPin2, pins.map(speed1, 0, 100, 0, 1023));
-        }
-        else {
-            pins.analogWritePin(fanPin2, 0);
-            pins.analogWritePin(fanPin1, 0);
-        }
-
-    }
+   
 
     /**
      *  Get startbit current voltage,the unit is mV
