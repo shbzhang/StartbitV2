@@ -330,7 +330,7 @@ namespace StartbitV2 {
     let lhRGBLightBelt: StartbitRGBLight.LHstartbitRGBLight;
 
     let P14_ad = 0;
-
+    let soundLevel = 0;
 
     let MESSAGE_MAC = 0xff;
     let MESSAGE_ANGLE = 0x100;
@@ -369,6 +369,7 @@ namespace StartbitV2 {
                     let arg3Int: number = strToNumber(cmd.substr(5, 2));
 
                     P14_ad = arg1Int;
+                    soundLevel = arg2Int;
 
                     if (arg3Int != -1) {
                         currentVoltage = arg3Int * 78.63;
@@ -379,49 +380,6 @@ namespace StartbitV2 {
                     actiongroup_finished = true;
                 } else {
 
-                }
-            }
-            if (cmd.charAt(0).compare("C") == 0 && cmd.length == 11) {
-                if (lhRGBLightBelt != null) {
-                    for (let i = 0; i < 10; i++) {
-                        let color = converOneChar(cmd.charAt(i + 1));
-                        if (color != -1)
-                            lhRGBLightBelt.setPixelColor(i, color);
-                    }
-                    lhRGBLightBelt.show();
-                }
-            }
-            if (cmd.charAt(0).compare("M") == 0 && cmd.length == 18) {
-                macStr = cmd.substr(1, 17);
-                control.raiseEvent(MESSAGE_MAC, 1);
-            }
-            if (cmd.compare("WIFI_S_CONNECT") == 0) {
-                connectStatus = true;
-            }
-            if (cmd.compare("WIFI_S_DISCONNECT") == 0) {
-                connectStatus = false;
-            }
-            if (cmd.charAt(0).compare("S") == 0 && cmd.length == 5) {
-                let arg1Int: number = strToNumber(cmd.substr(1, 1));
-                let arg2Str = cmd.substr(2, 3);
-                if (arg2Str.compare("XXX") == 0) {
-                    return;
-                }
-                let arg2Int: number = 0;
-                if (arg2Str.charAt(0).compare("F") != 0) {
-                    arg2Int = strToNumber(arg2Str);
-                }
-                if (arg2Int > 1000)
-                    arg2Int = 1000;
-                if (arg1Int == 1) {
-                    servo1Angle = mapRGB(arg2Int, 0, 1000, 0, 240);
-                    servo1Angle -= 120;
-                    control.raiseEvent(MESSAGE_ANGLE, 1);
-                }
-                else if (arg1Int == 2) {
-                    servo2Angle = mapRGB(arg2Int, 0, 1000, 0, 240);
-                    servo2Angle -= 120;
-                    control.raiseEvent(MESSAGE_ANGLE, 2);
                 }
             }
         }
@@ -768,10 +726,19 @@ namespace StartbitV2 {
     /**
      *  Get startbit current voltage,the unit is mV
     */
-    //% weight=93 blockGap=50 blockId=startbit_getBatVoltage block="Get startbit current voltage (mV)"
+    //% weight=93 blockId=startbit_getBatVoltage block="Get startbit current voltage (mV)"
     //% subcategory=Sensor
     export function startbit_getBatVoltage(): number {
         return currentVoltage;
+    }
+
+    /**
+     *  Get startbit sound level
+    */
+    //% weight=92 blockGap=50 blockId=startbit_getSoundLevel block="Get startbit sound level (0~255)"
+    //% subcategory=Sensor
+    export function startbit_getSoundLevel(): number {
+        return soundLevel;
     }
 	
     /**

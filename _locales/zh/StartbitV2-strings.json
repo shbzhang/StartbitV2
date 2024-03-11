@@ -193,5 +193,6 @@
 	"StartbitV2.startbit_MP3_BUTTON|block":"MP3模块 |%button 歌曲",
 	"StartbitV2.startbit_MP3_VOL|block":"MP3模块音量 |%value",
 	"StartbitV2.startbit_MP3_SINGLE_LOOP|block":"MP3模块单曲循环 |%state",
-	"StartbitV2.startbit_MP3_PLAY_NUM|block":"MP3模块播放序号|%num 歌曲"
+	"StartbitV2.startbit_MP3_PLAY_NUM|block":"MP3模块播放序号|%num 歌曲",
+	"StartbitV2.startbit_getSoundLevel|block":"获取音量等级(0~255)"
 }
