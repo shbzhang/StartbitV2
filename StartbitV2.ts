@@ -1960,4 +1960,15 @@ namespace StartbitV2 {
         }
         return status;
     }
+
+    //% weight=94 blockId=line_followers_status blockGap=50 block="4ch Line follower on Black Line ?"
+    //% inlineInputMode=inline
+    //% subcategory=Sensor
+    export function startbit_line_followers_status(): number[] {
+	let s1 = startbit_line_followers(startbit_LineFollowerSensors.S1, startbit_LineColor.Black);
+	let s2 = startbit_line_followers(startbit_LineFollowerSensors.S2, startbit_LineColor.Black);
+	let s3 = startbit_line_followers(startbit_LineFollowerSensors.S3, startbit_LineColor.Black);
+	let s4 = startbit_line_followers(startbit_LineFollowerSensors.S4, startbit_LineColor.Black);
+	return [s1, s2, s3, s4];
+    }
 }
