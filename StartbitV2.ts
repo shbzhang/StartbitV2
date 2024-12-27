@@ -2071,7 +2071,7 @@ namespace StartbitV2 {
             if (s[0] && s[3]) {
                 break
             }
-	    let error = 0
+	    error = 0
 	    if (s[0]) { error = error - 3 )
 	    if (s[1]) { error = error - 1 )
 	    if (s[2]) { error = error + 1 )
