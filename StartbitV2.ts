@@ -2000,6 +2000,7 @@ namespace StartbitV2 {
 
 
     //% weight=14 blockId=line_followers_status blockGap=50 block="以速度$speed找线，摆动$wiggle毫秒，前进$forward毫秒"
+    //% wiggle.defl = 300 forward.defl = 300
     //% subcategory=Sensor
     function findLine(speed: number, wiggle: number, forward: number) {
         // already on black line?
@@ -2008,27 +2009,27 @@ namespace StartbitV2 {
             return
         }
         // try left
-        if (stopTillFound(-speed, speed, wiggle, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
+        if (moveTillFound(-speed, speed, wiggle, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
         // move forward
-        if (stopTillFound(speed, speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
+        if (moveTillFound(speed, speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
         // move back
-        if (stopTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
+        if (moveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
         // try right
-        if (stopTillFound(speed, -speed, wiggle * 2, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
+        if (moveTillFound(speed, -speed, wiggle * 2, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
         // move forward
-        if (stopTillFound(speed, speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
+        if (moveTillFound(speed, speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
         // not found
-        if (stopTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
+        if (moveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
     }
@@ -2038,6 +2039,7 @@ namespace StartbitV2 {
     //% subcategory=Sensor
     export function followForTime(speed: number, time: number): void {
         let startTime = input.runningTime()
+	let s = [false, false, false, false]
         while ((input.runningTime() - startTime < time * 1000)) {
             s = sensorsOnBlack()
             if (!s[0] && !s[3]) {
@@ -2062,6 +2064,8 @@ namespace StartbitV2 {
         let startTime = input.runningTime()
         let speed1 = 0
         let speed2 = 0
+	let s = [false, false, false, false]
+	let error = 0
         while ((input.runningTime() - startTime < time * 1000)) {
             s = sensorsOnBlack()
             if (s[0] && s[3]) {
@@ -2113,18 +2117,18 @@ namespace StartbitV2 {
                 basic.pause(300)
                 let s = sensorsOnBlack()
                 if (!s[1] && !s[2]) {
-                    findLine(10)
+                    findLine(30, 0.5, 0.5)
                 }
                 break
             }
             case direction.Back: {
                 // to cross
-                startbit.startbit_setMotorSpeed(speed, speed)
+                startbit_setMotorSpeed(speed, speed)
                 basic.pause(300)
-                startbit.startbit_setMotorSpeed(0, 0)
+                startbit_setMotorSpeed(0, 0)
                 basic.pause(20)
                 // rotate a little
-                startbit.startbit_setMotorSpeed(-speed, speed)
+                startbit_setMotorSpeed(-speed, speed)
                 basic.pause(200)
                 while (startbit_line_followers(startbit_LineFollowerSensors.S2, startbit_LineColor.White)) {
                 }
@@ -2135,7 +2139,7 @@ namespace StartbitV2 {
                 break
             }
         }
-        startbit.startbit_setMotorSpeed(0, 0)
+        startbit_setMotorSpeed(0, 0)
         basic.pause(20)
     }
 }
