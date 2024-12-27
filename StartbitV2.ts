@@ -1963,12 +1963,43 @@ namespace StartbitV2 {
 
     //% weight=94 blockId=line_followers_status blockGap=50 block="4ch Line follower on Black Line ?"
     //% inlineInputMode=inline
-    //% subcategory=Sensor
+    //% subcategory=tool
     export function startbit_line_followers_status(): boolean[] {
 	let s1 = startbit_line_followers(startbit_LineFollowerSensors.S1, startbit_LineColor.Black);
 	let s2 = startbit_line_followers(startbit_LineFollowerSensors.S2, startbit_LineColor.Black);
 	let s3 = startbit_line_followers(startbit_LineFollowerSensors.S3, startbit_LineColor.Black);
 	let s4 = startbit_line_followers(startbit_LineFollowerSensors.S4, startbit_LineColor.Black);
 	return [s1, s2, s3, s4];
+    }
+
+    //% weight=95 blockId=moveForTime blockGap=50 block="move for $time second"
+    //% subcategory=tool
+    export function moveForTime(m1: number, m2: number, time:number): void {
+        startbit_setMotorSpeed(m1, m2)
+        basic.pause(time*1000)
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+
+    //% weight=96 blockId=line_followers_status blockGap=50 block="follow for $time second"
+    //% speed.min=-100 speed.max=100 speed.defl=100 time.min=0 time.max=5 time.defl=0.3
+    //% subcategory=tool
+    export function followForTime(speed: number, time: number): void {
+        let startTime = input.runningTime()
+        let s = startbit_line_followers_status()
+        while ((input.runningTime() - startTime < time*1000) && !s[0] && !s[3]) {
+            if (s[1] && s[2]) {
+                startbit_setMotorSpeed(speed, speed)
+            } else if (s[1] && !s[2]) {
+                startbit_setMotorSpeed(speed/2, speed)
+            } else if (!s[1] && s[2]) {
+                startbit_setMotorSpeed(speed, speed/2)
+            } else {
+                break
+            }
+            s = startbit_line_followers_status()
+        }
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
     }
 }
