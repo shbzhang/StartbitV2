@@ -1961,9 +1961,9 @@ namespace StartbitV2 {
         return status;
     }
 
-    //% weight=91 blockId=line_followers_status blockGap=50 block="四路巡线模块检测到黑线？"
+    //% weight=20 blockId=line_followers_status blockGap=50 block="四路巡线模块在黑线上？"
     //% inlineInputMode=inline
-    //% subcategory=tool
+    //% subcategory=Sensor
     export function sensorsOnBlack(): boolean[] {
         let s1 = startbit_line_followers(startbit_LineFollowerSensors.S1, startbit_LineColor.Black);
         let s2 = startbit_line_followers(startbit_LineFollowerSensors.S2, startbit_LineColor.Black);
@@ -1972,48 +1972,23 @@ namespace StartbitV2 {
         return [s1, s2, s3, s4];
     }
 
-    //% weight=92 blockId=moveForTime blockGap=50 block="移动$time秒"
-    //% subcategory=tool
-    export function moveForTime(m1: number, m2: number, time:number): void {
-        startbit_setMotorSpeed(m1, m2)
+    //% weight=19 blockId=moveForTime blockGap=50 block="以电机1速度$speed1和电机2速度$speed2移动$time秒"
+    //% subcategory=Sensor
+    export function moveForTime(speed1: number, speed2: number, time:number): void {
+        startbit_setMotorSpeed(speed1, speed2)
         basic.pause(time*1000)
         startbit_setMotorSpeed(0, 0)
         basic.pause(20)
     }
 
-    //% weight=93 blockId=line_followers_status blockGap=50 block="线上$time秒"
-    //% speed.min=-100 speed.max=100 speed.defl=100 time.min=0 time.max=5 time.defl=0.3
-    //% subcategory=tool
-    export function followForTime(speed: number, time: number): void {
-        let startTime = input.runningTime()
-        let s = sensorsOnBlack()
-        while ((input.runningTime() - startTime < time*1000) && !s[0] && !s[3]) {
-            if (s[1] && s[2]) {
-                startbit_setMotorSpeed(speed, speed)
-            } else if (s[1] && !s[2]) {
-                startbit_setMotorSpeed(speed/2, speed)
-            } else if (!s[1] && s[2]) {
-                startbit_setMotorSpeed(speed, speed/2)
-            } else {
-                break
-            }
-            s = sensorsOnBlack()
-        }
-        startbit_setMotorSpeed(0, 0)
-        basic.pause(20)
-    }
-
-
-    //% weight=94 blockId=line_followers_status blockGap=50 block="$sensor到黑线停止"
-    //% subcategory=tool
-    export function stopTillBlack(sensor: startbit_LineFollowerSensors, m1: number, m2: number, time: number): boolean {
+    //% weight=18 blockId=line_followers_status blockGap=50 block="以电机1速度$speed1和电机2速度$speed2移动$time秒或直到$sensor找到$line"
+    //% subcategory=Sensor
+    export function moveTillFound(speed1: number, speed2: number, time: number, sensor: startbit_LineFollowerSensors, color: startbit_LineColor): boolean {
         let found = false
         let startTime = input.runningTime()
-        let s = startbit_line_followers(sensor, startbit_LineColor.Black)
-        while (input.runningTime() - startTime < time*1000) {
-            startbit_setMotorSpeed(m1, m2)
-            s = startbit_line_followers(sensor, startbit_LineColor.Black)
-            if (s) {
+        while (input.runningTime() - startTime < time * 1000) {
+            startbit_setMotorSpeed(speed1, speed2)
+            if (startbit_line_followers(sensor, color)) {
                 found = true
                 break
             }
@@ -2023,36 +1998,144 @@ namespace StartbitV2 {
         return found
     }
 
-    //% weight=95 blockId=line_followers_status blockGap=50 block="回线"
-    //% subcategory=tool
+
+    //% weight=14 blockId=line_followers_status blockGap=50 block="以速度$speed找线，摆动$wiggle毫秒，前进$forward毫秒"
+    //% subcategory=Sensor
     function findLine(speed: number, wiggle: number, forward: number) {
         // already on black line?
-        if (stopTillBlack(0, 0, 20)) {
+        let s = sensorsOnBlack()
+        if (s[1] || s[2]) {
             return
         }
         // try left
-        if (stopTillBlack(-speed, speed, wiggle)) {
+        if (stopTillFound(-speed, speed, wiggle, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
         // move forward
-        if (stopTillBlack(speed, speed, forward)) {
+        if (stopTillFound(speed, speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
         // move back
-        if (stopTillBlack(-speed, -speed, forward)) {
+        if (stopTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
         // try right
-        if (stopTillBlack(speed, -speed, wiggle*2)) {
+        if (stopTillFound(speed, -speed, wiggle * 2, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
         // move forward
-        if (stopTillBlack(speed, speed, forward)) {
+        if (stopTillFound(speed, speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
         // not found
-        if (stopTillBlack(-speed, -speed, forward)) {
+        if (stopTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
+    }
+
+    //% weight=16 blockId=line_followers_status blockGap=50 block="以速度$speed进行巡线$time秒"
+    //% speed.min=-100 speed.max=100 speed.defl=100 kp.min=0.01 kp.max=50 kp.defl=30 time.min=0 time.max=100 time.defl=100
+    //% subcategory=Sensor
+    export function followForTime(speed: number, time: number): void {
+        let startTime = input.runningTime()
+        while ((input.runningTime() - startTime < time * 1000)) {
+            s = sensorsOnBlack()
+            if (!s[0] && !s[3]) {
+                if (s[1] && s[2]) {startbit_setMotorSpeed(speed, speed)}
+                else if (s[1] && !s[2]) { startbit_setMotorSpeed(speed / 2, speed) }
+                else if (!s[1] && s[2]) { startbit_setMotorSpeed(speed, speed/2) }
+                else {break}
+            } else {
+                if (s[0] && !s[3]) { startbit_setMotorSpeed(-speed/2, speed) }
+                else if (!s[0] && s[3]) { startbit_setMotorSpeed(speed, -speed / 2) }
+                else { break }
+            }
+        }
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+
+    //% weight=15 blockId=line_followers_status blockGap=50 block="以速度$speed进行P巡线$time秒"
+    //% speed.min=-100 speed.max=100 speed.defl=100 kp.min=0.01 kp.max=50 kp.defl=30 time.min=0 time.max=100 time.defl=100
+    //% subcategory=Sensor
+    export function pFollowForTime(speed: number, kp: number, time: number): void {
+        let startTime = input.runningTime()
+        let speed1 = 0
+        let speed2 = 0
+        while ((input.runningTime() - startTime < time * 1000)) {
+            s = sensorsOnBlack()
+            if (s[0] && s[3]) {
+                break
+            }
+            error = -3 * s[0] - s[1] + s[2] +3 * s[3]
+            speed1 = Math.min(Math.max(speed + kp * error, -100), 100)
+            speed2 = Math.min(Math.max(speed - kp * error, -100), 100)
+            startbit_setMotorSpeed(speed1, speed2)
+        }
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+
+    export enum direction {
+        //% block "左"
+        Left = 1,
+        //% block "前"
+        Forward = 2,
+        //% block "右"
+        Right = 3,
+        //% block "后"
+        Back = 4
+    }
+
+    //% weight=17 blockId=line_followers_status blockGap=50 block="十字路口向$direct以速度$speed"
+    //% speed.min=0, speed.max=100, speed.defl=50
+    //% subcategory=Sensor
+    export function crossroads(direct: direction, speed: number) {
+        switch (direct) {
+            case direction.Left: {
+                startbit_setMotorSpeed(speed/3, speed)
+                basic.pause(200)
+                while (startbit_line_followers(startbit_LineFollowerSensors.S3, startbit_LineColor.White)) {
+                    startbit_setMotorSpeed(-speed, speed)
+                }
+                break
+            }
+            case direction.Right: {
+                startbit_setMotorSpeed(speed / 3, speed)
+                basic.pause(200)
+                while (startbit_line_followers(startbit_LineFollowerSensors.S2, startbit_LineColor.White)) {
+                    startbit_setMotorSpeed(speed, -speed)
+                }
+                break
+            }
+            case direction.Forward: {
+                startbit_setMotorSpeed(speed, speed)
+                basic.pause(300)
+                let s = sensorsOnBlack()
+                if (!s[1] && !s[2]) {
+                    findLine(10)
+                }
+                break
+            }
+            case direction.Back: {
+                // to cross
+                startbit.startbit_setMotorSpeed(speed, speed)
+                basic.pause(300)
+                startbit.startbit_setMotorSpeed(0, 0)
+                basic.pause(20)
+                // rotate a little
+                startbit.startbit_setMotorSpeed(-speed, speed)
+                basic.pause(200)
+                while (startbit_line_followers(startbit_LineFollowerSensors.S2, startbit_LineColor.White)) {
+                }
+                while (startbit_line_followers(startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
+                }
+                while (startbit_line_followers(startbit_LineFollowerSensors.S3, startbit_LineColor.White)) {
+                }
+                break
+            }
+        }
+        startbit.startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
     }
 }
