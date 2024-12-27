@@ -2071,7 +2071,11 @@ namespace StartbitV2 {
             if (s[0] && s[3]) {
                 break
             }
-            error = -3 * s[0] - s[1] + s[2] +3 * s[3]
+	    let error = 0
+	    if (s[0]) { error = error - 3 )
+	    if (s[1]) { error = error - 1 )
+	    if (s[2]) { error = error + 1 )
+	    if (s[3]) { error = error + 3 )
             speed1 = Math.min(Math.max(speed + kp * error, -100), 100)
             speed2 = Math.min(Math.max(speed - kp * error, -100), 100)
             startbit_setMotorSpeed(speed1, speed2)
