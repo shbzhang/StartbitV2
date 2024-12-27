@@ -1964,7 +1964,7 @@ namespace StartbitV2 {
     //% weight=94 blockId=line_followers_status blockGap=50 block="4ch Line follower on Black Line ?"
     //% inlineInputMode=inline
     //% subcategory=tool
-    export function startbit_line_followers_status(): boolean[] {
+    export function sensorsOnBlack(): boolean[] {
 	let s1 = startbit_line_followers(startbit_LineFollowerSensors.S1, startbit_LineColor.Black);
 	let s2 = startbit_line_followers(startbit_LineFollowerSensors.S2, startbit_LineColor.Black);
 	let s3 = startbit_line_followers(startbit_LineFollowerSensors.S3, startbit_LineColor.Black);
@@ -1986,7 +1986,7 @@ namespace StartbitV2 {
     //% subcategory=tool
     export function followForTime(speed: number, time: number): void {
         let startTime = input.runningTime()
-        let s = startbit_line_followers_status()
+        let s = sensorsOnBlack()
         while ((input.runningTime() - startTime < time*1000) && !s[0] && !s[3]) {
             if (s[1] && s[2]) {
                 startbit_setMotorSpeed(speed, speed)
@@ -1997,7 +1997,7 @@ namespace StartbitV2 {
             } else {
                 break
             }
-            s = startbit_line_followers_status()
+            s = sensorsOnBlack()
         }
         startbit_setMotorSpeed(0, 0)
         basic.pause(20)
