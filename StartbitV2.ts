@@ -2002,7 +2002,7 @@ namespace StartbitV2 {
         Back
     }
 
-    //% weight=18 blockId=crossroads blockGap=50 block="十字路口以速度$speed向$direct"
+    //% weight=18 blockId=crossroads blockGap=50 block="以速度$speed在路口向$direct"
     //% speed.min=0 speed.max=100 speed.defl=100
     //% subcategory=Sensor
     export function crossroads(direct: direction, speed: number) {
@@ -2072,7 +2072,7 @@ namespace StartbitV2 {
 	followForTime(10, 100)
     }
 	
-    //% weight=15 blockId=dropOne blockGap=50 block="前进$forward秒放下"
+    //% weight=15 blockId=dropOne blockGap=50 block="前进$forward秒放下并回到线上"
     //% forward.min=0, forward.max=3, forward.defl=0.9
     //% subcategory=Sensor
     export function dropOne (forward: number) {
