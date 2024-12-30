@@ -2055,7 +2055,7 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% weight=17 blockId=moveForTime blockGap=50 block="dong$$speed1$speed2$time"
+    //% weight=17 blockId=moveForTime blockGap=50 block="dong$speed1$speed2$time"
     /*"以电机1速度$speed1和电机2速度$speed2移动$time秒"*/
     //% speed1.min=-100 speed1.max=100 speed1.defl=100 speed2.min=-100 speed2.max=100 speed2.defl=100 time.min=0 time.defl=1
     //% subcategory=Sensor
@@ -2112,7 +2112,7 @@ namespace StartbitV2 {
 
     //% weight=14 blockId=moveTillFound blockGap=50 block="tan$speed1$speed2$time$sensor$color"
     /* 以电机1速度$speed1和电机2速度$speed2移动$time秒或直到$sensor找到$line" */
-    //% speed1.min=-100 speed1.max=100 speed1.defl=50 speed2.min=-100 speed2.max=100 speed2.defl=50 time.min=0 time.defl=2
+    //% speed1.min=-100 speed1.max=100 speed1.defl=60 speed2.min=-100 speed2.max=100 speed2.defl=60 time.min=0 time.defl=2
     //% inlineInputMode=inline
     //% subcategory=Sensor
     export function moveTillFound(speed1: number, speed2: number, time: number, sensor: startbit_LineFollowerSensors, color: startbit_LineColor): boolean {
@@ -2134,7 +2134,7 @@ namespace StartbitV2 {
     /* "以速度$speed找线，摆动$wiggle秒，前进$forward秒" */
     //% wiggle.defl = 0.4 forward.defl = 0.8
     //% subcategory=Sensor
-    function findLine(wiggle: number, forward: number) {
+    export function findLine(wiggle: number, forward: number) {
 	let speed = 80
         // already on black line?
         let s = sensorsOnBlack()
