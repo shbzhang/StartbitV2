@@ -2055,7 +2055,7 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% weight=17 blockId=moveForTime blockGap=50 block="dong$speed1$speed2$time"
+    //% weight=17 blockId=moveForTime blockGap=50 block="dong $speed1 $speed2 $time"
     /*"以电机1速度$speed1和电机2速度$speed2移动$time秒"*/
     //% speed1.min=-100 speed1.max=100 speed1.defl=100 speed2.min=-100 speed2.max=100 speed2.defl=100 time.min=0 time.defl=1
     //% subcategory=Sensor
