@@ -1961,6 +1961,9 @@ namespace StartbitV2 {
         return status;
     }
 
+    /**
+     * check if 4 sensors on black line, return a list of 4 bools
+     */
     //% weight=20 blockId=sensorsOnBlack blockGap=50 block="四路巡线模块在黑线上？"
     //% inlineInputMode=inline
     //% subcategory=Sensor
@@ -1972,18 +1975,24 @@ namespace StartbitV2 {
         return [s1, s2, s3, s4];
     }
 
-    //% weight=19 blockId=followForTime blockGap=50 block="以速度$speed进行巡线$time秒"
-    //% time.min=0 time.max=100 time.defl=10 speed.min=-100 speed.max=100 speed.defl=100
+    /**
+     * follow a straight of a curve line, stop at crossroad or quarter turn
+     */
+    //% weight=19 blockId=followForTime blockGap=50 block="zhi$time"
+    /*"以速度$speed进行巡线$time秒"*/
+    //% time.min=0 time.max=100 time.defl=10
+    /*speed.min=-100 speed.max=100 speed.defl=100*/
     //% subcategory=Sensor
-    export function followForTime(time: number, speed: number): void {
+    export function followForTime(time: number): void {
+	let speed = 100
         let startTime = input.runningTime()
 	let s = [false, false, false, false]
         while ((input.runningTime() - startTime < time * 1000)) {
             s = sensorsOnBlack()
             if (!s[0] && !s[3]) {
                 if (s[1] && s[2]) {startbit_setMotorSpeed(speed, speed)}
-                else if (s[1] && !s[2]) { startbit_setMotorSpeed(0, speed) }
-                else if (!s[1] && s[2]) { startbit_setMotorSpeed(speed, 0) }
+                else if (s[1] && !s[2]) { startbit_setMotorSpeed(speed, 0) }
+                else if (!s[1] && s[2]) { startbit_setMotorSpeed(0, speed) }
                 else {startbit_setMotorSpeed(speed, speed)}
             } else {break}
         }
@@ -2002,16 +2011,19 @@ namespace StartbitV2 {
         Back
     }
 
-    //% weight=18 blockId=crossroads blockGap=50 block="以速度$speed在路口向$direct"
-    //% speed.min=0 speed.max=100 speed.defl=100
+    //% weight=18 blockId=crossroads blockGap=50 block="lu$direct"
+    /*"以速度$speed在路口向$direct"*/
+    //% direct.min=1 direct.max=4, direct.defl=2
+    /*speed.min=0 speed.max=100 speed.defl=100*/
     //% subcategory=Sensor
-    export function crossroads(direct: direction, speed: number) {
-        StartbitV2.startbit_setMotorSpeed(100, 100)
+    export function crossroads(direct: number) {
+	let speed = 100
+        startbit_setMotorSpeed(speed, speed)
 	basic.pause(250)
-    	StartbitV2.startbit_setMotorSpeed(0, 0)
+    	startbit_setMotorSpeed(0, 0)
 	basic.pause(20)
         switch (direct) {
-            case direction.Left: {
+            case 1: {
                 startbit_setMotorSpeed(speed, -speed)
                 basic.pause(600)
                 while (startbit_line_followers(startbit_LineFollowerSensors.S3, startbit_LineColor.White)) {
@@ -2019,7 +2031,7 @@ namespace StartbitV2 {
                 }
                 break
             }
-            case direction.Right: {
+            case 3: {
                 startbit_setMotorSpeed(-speed, speed)
                 basic.pause(600)
                 while (startbit_line_followers(startbit_LineFollowerSensors.S2, startbit_LineColor.White)) {
@@ -2027,10 +2039,10 @@ namespace StartbitV2 {
                 }
                 break
             }
-            case direction.Forward: {
+            case 2: {
 		break
             }
-            case direction.Back: {
+            case 4: {
                 startbit_setMotorSpeed(speed, -speed)
                 basic.pause(1800)
                 while (startbit_line_followers(startbit_LineFollowerSensors.S3, startbit_LineColor.White)) {
@@ -2043,7 +2055,8 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% weight=17 blockId=moveForTime blockGap=50 block="以电机1速度$speed1和电机2速度$speed2移动$time秒"
+    //% weight=17 blockId=moveForTime blockGap=50 block="dong$$speed1$speed2$time"
+    /*"以电机1速度$speed1和电机2速度$speed2移动$time秒"*/
     //% speed1.min=-100 speed1.max=100 speed1.defl=100 speed2.min=-100 speed2.max=100 speed2.defl=100 time.min=0 time.defl=1
     //% subcategory=Sensor
     export function moveForTime(speed1: number, speed2: number, time:number): void {
@@ -2053,31 +2066,36 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% weight=16 blockId=grabOne blockGap=50 block="前进$forward秒再以角度$angle抓取"
-    //% angle.min=10 angle.max=90 angle.defl=75 forward.min=0, forward.max=3, forward.defl=2.2
+    //% weight=16 blockId=grabOne blockGap=50 block="zhua$angle"
+    /* "前进$forward秒再以角度$angle抓取" */
+    //% angle.min=10 angle.max=90 angle.defl=75
+    /* forward.min=0, forward.max=3, forward.defl=2.2 */
     //% subcategory=Sensor
-    export function grabOne (angle: number, forward: number) {
+    export function grabOne (angle: number) {
+	let forward = 2.2
 	// arm down
 	setPwmServo(startbit_servorange.range1, 1, 180, 1000)
 	// claw open
 	setPwmServo(startbit_servorange.range1, 4, 0, 1000)
 	// move closer
-	followForTime(forward, 100)
+	followForTime(forward)
 	// claw close, battery:75, cup:45, tin:45
 	setPwmServo(startbit_servorange.range1, 4, angle, 500)
 	basic.pause(700)
 	// arm up
 	setPwmServo(startbit_servorange.range1, 1, 40, 1000)
 	// to crossroad
-	followForTime(10, 100)
+	followForTime(10)
     }
 	
-    //% weight=15 blockId=dropOne blockGap=50 block="前进$forward秒放下并回到线上"
-    //% forward.min=0, forward.max=3, forward.defl=0.9
+    //% weight=15 blockId=dropOne blockGap=50 block="fang"
+    /* "前进$forward秒放下并回到线上" */
+    /* forward.min=0, forward.max=3, forward.defl=0.9 */
     //% subcategory=Sensor
-    export function dropOne (forward: number) {
+    export function dropOne () {
+	let forward = 0.9
 	// move closer
-	followForTime(forward, 100)
+	followForTime(forward)
 	// arm down
         setPwmServo(startbit_servorange.range1, 1, 180, 1000)
 	basic.pause(1200)
@@ -2089,10 +2107,12 @@ namespace StartbitV2 {
 	// backward
 	moveForTime(-100, -100, forward+1)
 	// back to line
-	followForTime(10, 100)
+	followForTime(10)
     }
 
-    //% weight=14 blockId=moveTillFound blockGap=50 block="以电机1速度$speed1和电机2速度$speed2移动$time秒或直到$sensor找到$line"
+    //% weight=14 blockId=moveTillFound blockGap=50 block="tan$speed1$speed2$time$sensor$color"
+    /* 以电机1速度$speed1和电机2速度$speed2移动$time秒或直到$sensor找到$line" */
+    //% speed1.min=-100 speed1.max=100 speed1.defl=50 speed2.min=-100 speed2.max=100 speed2.defl=50 time.min=0 time.defl=2
     //% inlineInputMode=inline
     //% subcategory=Sensor
     export function moveTillFound(speed1: number, speed2: number, time: number, sensor: startbit_LineFollowerSensors, color: startbit_LineColor): boolean {
@@ -2110,17 +2130,29 @@ namespace StartbitV2 {
         return found
     }
 
-    //% weight=13 blockId=findLine blockGap=50 block="以速度$speed找线，摆动$wiggle秒，前进$forward秒"
-    //% wiggle.defl = 0.3 forward.defl = 0.5
+    //% weight=13 blockId=findLine blockGap=50 block="diu$wiggle$forward"
+    /* "以速度$speed找线，摆动$wiggle秒，前进$forward秒" */
+    //% wiggle.defl = 0.4 forward.defl = 0.8
     //% subcategory=Sensor
-    function findLine(speed: number, wiggle: number, forward: number) {
+    function findLine(wiggle: number, forward: number) {
+	let speed = 80
         // already on black line?
         let s = sensorsOnBlack()
         if (s[1] || s[2]) {
             return
         }
+	    
+	// try front
+        if (moveTillFound(speed, speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
+            return
+        }
+        // move back
+        if (moveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
+            return
+        }
+	    
         // try left
-        if (moveTillFound(speed, speed, wiggle, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
+        if (moveTillFound(speed, -speed, wiggle, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
         // move forward
@@ -2131,6 +2163,7 @@ namespace StartbitV2 {
         if (moveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
+	
         // try right
         if (moveTillFound(-speed, speed, wiggle * 2, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
@@ -2145,7 +2178,8 @@ namespace StartbitV2 {
         }
     }
 
-    //% weight=12 blockId=pFollowForTime blockGap=50 block="以速度$speed进行P巡线$time秒"
+    //% weight=12 blockId=pFollowForTime blockGap=50 block="p$time"
+    /* "以速度$speed进行P巡线$time秒" */
     //% time.min=0 time.max=100 time.defl=10
     //% subcategory=Sensor
     export function pFollowForTime(time: number): void {
@@ -2176,6 +2210,4 @@ namespace StartbitV2 {
         startbit_setMotorSpeed(0, 0)
         basic.pause(20)
     }
-
-
 }
