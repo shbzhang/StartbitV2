@@ -2019,7 +2019,7 @@ namespace StartbitV2 {
     export function crossroads(direct: number) {
 	let speed = 100
         startbit_setMotorSpeed(speed, speed)
-	basic.pause(250)
+	basic.pause(220)
     	startbit_setMotorSpeed(0, 0)
 	basic.pause(20)
         switch (direct) {
@@ -2061,7 +2061,7 @@ namespace StartbitV2 {
     //% subcategory=Sensor
     export function moveForTime(speed1: number, speed2: number, time:number): void {
         startbit_setMotorSpeed(speed1, speed2)
-        basic.pause(time*1000)
+        basic.pause(time * 1000)
         startbit_setMotorSpeed(0, 0)
         basic.pause(20)
     }
@@ -2074,9 +2074,10 @@ namespace StartbitV2 {
     export function grabOne (angle: number) {
 	let forward = 2.2
 	// arm down
-	setPwmServo(startbit_servorange.range1, 1, 180, 1000)
+	setPwmServo(startbit_servorange.range1, 1, 180, 500)
 	// claw open
-	setPwmServo(startbit_servorange.range1, 4, 0, 1000)
+	setPwmServo(startbit_servorange.range1, 4, 0, 500)
+	basic.pause(700)
 	// move closer
 	followForTime(forward)
 	// claw close, battery:75, cup:45, tin:45
@@ -2084,6 +2085,7 @@ namespace StartbitV2 {
 	basic.pause(700)
 	// arm up
 	setPwmServo(startbit_servorange.range1, 1, 40, 1000)
+	basic.pause(1200)
 	// to crossroad
 	followForTime(10)
     }
