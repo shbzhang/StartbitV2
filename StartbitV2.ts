@@ -2019,7 +2019,7 @@ namespace StartbitV2 {
     export function crossroads(direct: number) {
 	let speed = 100
         startbit_setMotorSpeed(speed, speed)
-	basic.pause(240)
+	basic.pause(280)
     	startbit_setMotorSpeed(0, 0)
 	basic.pause(20)
         switch (direct) {
@@ -2072,20 +2072,45 @@ namespace StartbitV2 {
     /* forward.min=0, forward.max=3, forward.defl=2.2 */
     //% subcategory=Sensor
     export function grabOne (angle: number) {
-	let forward = 2.3
-	followForTime(1.5)
-	// arm down
-	setPwmServo(startbit_servorange.range1, 1, 180, 500)
-	// claw open
-	setPwmServo(startbit_servorange.range1, 4, 0, 500)
-	basic.pause(700)
-	// move closer
-	followForTime(forward-1.5)
-	// claw close, battery:75, cup:45, tin:45
-	setPwmServo(startbit_servorange.range1, 4, angle, 500)
-	basic.pause(700)
+	let forward = 2.2
+	// follow first to be stable
+	followForTime(1.6)
+	if (laji==1){ //battery
+	    // arm down
+	    setPwmServo(startbit_servorange.range1, 1, 180, 500)
+	    // claw open
+	    setPwmServo(startbit_servorange.range1, 4, 0, 500)
+	    basic.pause(700)
+	    // move closer
+	    followForTime(0.6)
+	    // arm up
+	    setPwmServo(startbit_servorange.range1, 4, 75, 500)
+	    basic.pause(700)
+	} else if (laji==2) { //cup
+	    // arm down
+	    setPwmServo(startbit_servorange.range1, 1, 160, 500)
+	    // claw open
+	    setPwmServo(startbit_servorange.range1, 4, 0, 500)
+	    basic.pause(700)
+	    // move closer
+	    followForTime(0.4)
+	    // arm up
+	    setPwmServo(startbit_servorange.range1, 4, 50, 500)
+	    basic.pause(700)
+	} else { //tin
+	    // arm down
+	    setPwmServo(startbit_servorange.range1, 1, 160, 500)
+	    // claw open
+	    setPwmServo(startbit_servorange.range1, 4, 0, 500)
+	    basic.pause(700)
+	    // move closer
+	    followForTime(0.4)
+	    // arm up
+	    setPwmServo(startbit_servorange.range1, 4, 65, 500)
+	    basic.pause(700)
+	}
 	// arm up
-	setPwmServo(startbit_servorange.range1, 1, 40, 1000)
+	setPwmServo(startbit_servorange.range1, 1, 35, 1000)
 	basic.pause(1200)
 	// to crossroad
 	followForTime(10)
@@ -2106,7 +2131,7 @@ namespace StartbitV2 {
 	setPwmServo(startbit_servorange.range1, 4, 0, 500)
 	basic.pause(700)
 	// arm up
-	setPwmServo(startbit_servorange.range1, 1, 40, 1000)
+	setPwmServo(startbit_servorange.range1, 1, 35, 1000)
 	// backward
 	moveForTime(-100, -100, forward+1)
 	// back to line
