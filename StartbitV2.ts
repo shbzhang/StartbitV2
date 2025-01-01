@@ -2068,10 +2068,11 @@ namespace StartbitV2 {
 
     //% weight=16 blockId=grabOne blockGap=50 block="zhua$angle"
     /* "前进$forward秒再以角度$angle抓取" */
-    //% angle.min=10 angle.max=90 angle.defl=75
+    //% laj.min=1 laji.max=90 laji.defl=1
+    /* angle.min=10 angle.max=90 angle.defl=75 */
     /* forward.min=0, forward.max=3, forward.defl=2.2 */
     //% subcategory=Sensor
-    export function grabOne (angle: number) {
+    export function grabOne (laji: number) {
 	let forward = 2.2
 	// follow first to be stable
 	followForTime(1.6)
