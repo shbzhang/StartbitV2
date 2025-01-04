@@ -1961,11 +1961,240 @@ namespace StartbitV2 {
         return status;
     }
 
-    /**
-     * check if 4 sensors on black line, return a list of 4 bools
-     */
-    //% weight=20 blockId=sensorsOnBlack blockGap=50 block="四路巡线模块在黑线上？"
-    //% inlineInputMode=inline
+    //% weight=30 blockId=calibrateSensor block="gdCe"
+    /* "转圈记录光电读数，计算中值、偏差" */
+    //% subcategory=Sensor
+    export function calibrateSensor() {
+        let s = 0
+        let maxValue = -100
+        let minValue = 10000
+        let startTime = control.millis()
+        startbit_setMotorSpeed(0, 100)
+        while (control.millis() - startTime < 10 * 1000) {
+            s = pins.analogReadPin(AnalogPin.P2)
+            if (s > maxValue) { maxValue = s }
+            if (s < minValue) { minValue = s }
+        }
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+
+        for (let i=0; i<4; i++) {
+            basic.showNumber((maxValue + minValue) / 2)
+            basic.pause(1500)
+            basic.showNumber((maxValue - minValue) / 4)
+            basic.pause(1500)
+        }
+    }
+
+    //% weight=29 blockId=singleGrayFollow block="gdZhi t $time m $median s $sigma"
+    /* "巡线$time秒，中值$median 偏差$sigma" */
+    //% time.defl=10 median.defl=400 sigma.defl=150
+    //% subcategory=Sensor
+    export function singleGrayFollow(time: number, median:number, sigma:number) {
+        let kp = 1
+        let speed = 100
+        let error = 0
+        let speed1 = 0
+        let speed2 = 0
+        let onBlack = 0
+        let onWhite = 0
+        let maxOnBlack = 200
+        let maxOnWhite = 200
+        let smoothError = 0
+        let smoothAlpha = 0.2
+        let graceTime = 0.4
+        let startTime = control.millis()
+        while (control.millis() - startTime < time * 1000) {
+            error = pins.analogReadPin(AnalogPin.P2) - median
+
+            smoothError = smoothAlpha * error + (1-smoothAlpha) * smoothError
+            if (control.millis() - startTime > graceTime * 1000) {
+                if (smoothError > sigma) {
+                    onWhite++
+                    onBlack = 0
+                } else if (smoothError < -sigma) {
+                    onWhite = 0
+                    onBlack++
+                } else {
+                    onWhite = 0
+                    onBlack = 0
+                }
+                
+                if (onBlack > maxOnBlack || onWhite > maxOnWhite) {
+                    break
+                }
+            }
+            speed1 = Math.constrain(speed - kp * error, -100, 100)
+            speed2 = Math.constrain(speed + kp * error, -100, 100)
+            startbit_setMotorSpeed(speed1, speed2)
+        }
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+
+    //% weight=28 blockId=singleGrayCrossroads block="gdLu d $direct m $median"
+    /* "路口向$direct 中值$median" */
+    //% direct.defl=1 median.defl=400
+    //% subcategory=Sensor
+    export function singleGrayCrossroads(direct: number, median: number) {
+        startbit_setMotorSpeed(100, 100)
+        basic.pause(300)
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+        switch (direct) {
+            case 1: {
+                startbit_setMotorSpeed(100, -100)
+                basic.pause(300)
+                while (pins.analogReadPin(AnalogPin.P2) > median) {
+                    startbit_setMotorSpeed(100, -100)
+                }
+                basic.pause(200)
+                break
+            }
+            case 2: {
+                while (pins.analogReadPin(AnalogPin.P2) > median) {
+                    startbit_setMotorSpeed(-100, 100)
+                }
+                break
+            }
+            case 3: {
+                startbit_setMotorSpeed(-100, 100)
+                basic.pause(800)
+                while (pins.analogReadPin(AnalogPin.P2) > median) {
+                    startbit_setMotorSpeed(-100, 100)
+                }
+                break
+            }
+            case 4: {
+                startbit_setMotorSpeed(100, -100)
+                basic.pause(1500)
+                while (pins.analogReadPin(AnalogPin.P2) > median) {
+                    startbit_setMotorSpeed(100, -100)
+                }
+                basic.pause(200)
+                break
+            }
+        }
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+
+    //% weight=27 blockId=singleGrayStopAtBlack block="gdZhaoHei m $median"
+    /* "前进至黑线 中值$median" */
+    //% median.defl=400
+    //% subcategory=Sensor
+    export function singleGrayStopAtBlack(median: number) {
+        while (pins.analogReadPin(AnalogReadWritePin.P2) > median) {
+            startbit_setMotorSpeed(100, 100)
+        }
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+
+    //% weight=26 blockId=singleGrayGrab block="gdZhua lj $laji m $median s $sigma"
+    /* "抓起垃圾编号$laji，中值$median 偏差$sigma" */
+    //% laj.min=1 laji.max=4 laji.defl=1 median.defl=400 sigma.defl=150
+    //% subcategory=Sensor
+    export function singleGrayGrab(laji: number, median: number, sigma: number) {
+        // follow first to be stable
+        let forward = 2.3
+        singleGrayFollow(1.5, median, sigma)
+        if (laji == 1) { //battery narrow
+            // arm down
+            setPwmServo(startbit_servorange.range1, 1, 180, 300)
+            // claw open
+            setPwmServo(startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            // move closer
+            singleGrayFollow(forward - 1.5, median, sigma)
+            // claw close
+            setPwmServo(startbit_servorange.range1, 4, 75, 300)
+            basic.pause(500)
+        } else if (laji == 2) { //battery wide
+            // arm down
+            setPwmServo(startbit_servorange.range1, 1, 180, 300)
+            // claw open
+            setPwmServo(startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            // move closer
+            singleGrayFollow(forward - 1.5, median, sigma)
+            // claw close
+            setPwmServo(startbit_servorange.range1, 4, 70, 300)
+            basic.pause(500)
+        } else if (laji == 3) { //cup
+            // arm down
+            setPwmServo(startbit_servorange.range1, 1, 170, 300)
+            // claw open
+            setPwmServo(startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            // move closer
+            singleGrayFollow(forward - 1.5, median, sigma)
+            // claw close
+            setPwmServo(startbit_servorange.range1, 4, 45, 300)
+            basic.pause(500)
+        } else { //tin
+            // arm down
+            setPwmServo(startbit_servorange.range1, 1, 160, 300)
+            // claw open
+            setPwmServo(startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            // move closer
+            singleGrayFollow(forward - 1.5, median, sigma)
+            // claw close
+            setPwmServo(startbit_servorange.range1, 4, 55, 300)
+            basic.pause(500)
+        }
+        // arm up
+        setPwmServo(startbit_servorange.range1, 1, 35, 800)
+        basic.pause(1000)
+        // to crossroad
+        singleGrayFollow(10, median, sigma)
+    }
+
+    //% weight=25 blockId=singleGrayDrop block="gdFang lj $laji m $median"
+    /* "放下垃圾编号$laji" */
+    //% laj.min=1 laji.max=4 laji.defl=1 median.defl=400
+    //% subcategory=Sensor
+    export function singleGrayDrop(laji: number, median: number) {
+        let forward = 0.9
+        // move closer
+        moveForTime(100, 100, forward)
+        // arm down
+        if (laji == 1 || laji == 2) {
+            setPwmServo(startbit_servorange.range1, 1, 180, 800)
+        } else if (laji == 3) {
+            setPwmServo(startbit_servorange.range1, 1, 170, 800)
+        } else {
+            setPwmServo(startbit_servorange.range1, 1, 160, 800)
+        }
+        basic.pause(1000)
+        // claw open
+        setPwmServo(startbit_servorange.range1, 4, 0, 300)
+        basic.pause(500)
+        // backward a little
+        moveForTime(-100, -100, forward)
+        // arm up
+        setPwmServo(startbit_servorange.range1, 1, 35, 500)
+        basic.pause(700)
+        // backward
+        moveForTime(-100, -100, 0.8)
+        // back to line
+        singleGrayStopAtBlack(median)
+    }
+
+    //% weight=24 blockId=moveForTime blockGap=50 block="dong $speed1 $speed2 $time"
+    /* "电机1$speed1电机2$speed2行进$time秒" */
+    //% speed1.min=-100 speed1.max=100 speed1.defl=100 speed2.min=-100 speed2.max=100 speed2.defl=100 time.min=0 time.defl=1
+    //% subcategory=Sensor
+    export function moveForTime(speed1: number, speed2: number, time: number): void {
+        startbit_setMotorSpeed(speed1, speed2)
+        basic.pause(time * 1000)
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+
+
+    //% weight=20 blockId=sensorsOnBlack block="四路巡线模块在黑线上？"
     //% subcategory=Sensor
     export function sensorsOnBlack(): boolean[] {
         let s1 = startbit_line_followers(startbit_LineFollowerSensors.S1, startbit_LineColor.Black);
@@ -1975,32 +2204,29 @@ namespace StartbitV2 {
         return [s1, s2, s3, s4];
     }
 
-    /**
-     * follow a straight of a curve line, stop at crossroad or quarter turn
-     */
-    //% weight=19 blockId=followForTime blockGap=50 block="zhi$time"
-    /*"以速度$speed进行巡线$time秒"*/
+    //% weight=19 blockId=fourInfraredFollow block="hwZhi$time"
+    /*"巡线$time秒"*/
     //% time.min=0 time.max=100 time.defl=10
     /*speed.min=-100 speed.max=100 speed.defl=100*/
     //% subcategory=Sensor
-    export function followForTime(time: number): void {
-	let speed = 100
+    export function fourInfraredFollow(time: number): void {
+        let speed = 100
         let startTime = input.runningTime()
-	let s = [false, false, false, false]
+        let s = [false, false, false, false]
         while ((input.runningTime() - startTime < time * 1000)) {
             s = sensorsOnBlack()
             if (!s[0] && !s[3]) {
-                if (s[1] && s[2]) {startbit_setMotorSpeed(speed, speed)}
+                if (s[1] && s[2]) { startbit_setMotorSpeed(speed, speed) }
                 else if (s[1] && !s[2]) { startbit_setMotorSpeed(speed, 0) }
                 else if (!s[1] && s[2]) { startbit_setMotorSpeed(0, speed) }
-                else {startbit_setMotorSpeed(speed, speed)}
-            } else {break}
+                else { startbit_setMotorSpeed(speed, speed) }
+            } else { break }
         }
         startbit_setMotorSpeed(0, 0)
         basic.pause(20)
     }
 
-    export enum direction {
+    enum direction {
         //% block="左"
         Left,
         //% block="前"
@@ -2011,21 +2237,21 @@ namespace StartbitV2 {
         Back
     }
 
-    //% weight=18 blockId=crossroads blockGap=50 block="lu$direct"
-    /*"以速度$speed在路口向$direct"*/
+    //% weight=18 blockId=fourInfraredCrossroads block="hwLu$direct"
+    /*"路口向$direct"*/
     //% direct.min=1 direct.max=4, direct.defl=2
     /*speed.min=0 speed.max=100 speed.defl=100*/
     //% subcategory=Sensor
-    export function crossroads(direct: number) {
-	let speed = 100
-	// stop at crossroad
-	followForTime(10)
-	// enter crossroad
+    export function fourInfraredCrossroads(direct: number) {
+        let speed = 100
+        // stop at crossroad
+        //fourInfraredFollow(10)
+        // enter crossroad
         startbit_setMotorSpeed(speed, speed)
-	basic.pause(280)
-    	startbit_setMotorSpeed(0, 0)
-	basic.pause(20)
-	// turn
+        basic.pause(280)
+        startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+        // turn
         switch (direct) {
             case 1: {
                 startbit_setMotorSpeed(speed, -speed)
@@ -2044,7 +2270,7 @@ namespace StartbitV2 {
                 break
             }
             case 2: {
-		break
+                break
             }
             case 4: {
                 startbit_setMotorSpeed(speed, -speed)
@@ -2059,116 +2285,105 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% weight=17 blockId=moveForTime blockGap=50 block="dong $speed1 $speed2 $time"
-    /*"以电机1速度$speed1和电机2速度$speed2移动$time秒"*/
-    //% speed1.min=-100 speed1.max=100 speed1.defl=100 speed2.min=-100 speed2.max=100 speed2.defl=100 time.min=0 time.defl=1
-    //% subcategory=Sensor
-    export function moveForTime(speed1: number, speed2: number, time:number): void {
-        startbit_setMotorSpeed(speed1, speed2)
-        basic.pause(time * 1000)
-        startbit_setMotorSpeed(0, 0)
-        basic.pause(20)
-    }
-
-    //% weight=16 blockId=grabOne blockGap=50 block="zhua$angle"
-    /* "前进$forward秒再以角度$angle抓取" */
+    //% weight=16 blockId=fourInfraredGrab block="hwZhua$laji"
+    /* "抓起垃圾编号$laji" */
     //% laj.min=1 laji.max=90 laji.defl=1 forward.defl=2.2
     /* angle.min=10 angle.max=90 angle.defl=75 */
     /* forward.min=0, forward.max=3, forward.defl=2.2 */
     //% subcategory=Sensor
-    export function grabOne (laji: number) {
-	// follow first to be stable
-	let forward = 2.3
-	followForTime(1.5)
-	if (laji==1) { //battery narrow
-	    // arm down
-	    setPwmServo(startbit_servorange.range1, 1, 180, 300)
-	    // claw open
-	    setPwmServo(startbit_servorange.range1, 4, 0, 300)
-	    basic.pause(500)
-	    // move closer
-	    followForTime(forward-1.5)
-	    // claw close
-	    setPwmServo(startbit_servorange.range1, 4, 70, 300)
-	    basic.pause(500)
-	} else if (laji==2) { //battery wide
-	    // arm down
-	    setPwmServo(startbit_servorange.range1, 1, 180, 300)
-	    // claw open
-	    setPwmServo(startbit_servorange.range1, 4, 0, 300)
-	    basic.pause(500)
-	    // move closer
-	    followForTime(forward-1.5)
-	    // claw close
-	    setPwmServo(startbit_servorange.range1, 4, 65, 300)
-	    basic.pause(500)
-	} else if (laji==3) { //cup
-	    // arm down
-	    setPwmServo(startbit_servorange.range1, 1, 170, 300)
-	    // claw open
-	    setPwmServo(startbit_servorange.range1, 4, 0, 300)
-	    basic.pause(500)
-	    // move closer
-	    followForTime(forward-1.5)
-	    // claw close
-	    setPwmServo(startbit_servorange.range1, 4, 45, 300)
-	    basic.pause(500)
-	} else { //tin
-	    // arm down
-	    setPwmServo(startbit_servorange.range1, 1, 160, 300)
-	    // claw open
-	    setPwmServo(startbit_servorange.range1, 4, 0, 300)
-	    basic.pause(500)
-	    // move closer
-	    followForTime(forward-1.5)
-	    // claw close
-	    setPwmServo(startbit_servorange.range1, 4, 55, 300)
-	    basic.pause(500)
-	}
-	// arm up
-	setPwmServo(startbit_servorange.range1, 1, 35, 800)
-	basic.pause(1000)
-	// to crossroad
-	followForTime(10)
-    }
-	
-    //% weight=15 blockId=dropOne blockGap=50 block="fang"
-    /* "前进$forward秒放下并回到线上" */
-    /* forward.min=0, forward.max=3, forward.defl=0.9 */
-    //% subcategory=Sensor
-    export function dropOne (laji: number) {
-	let forward = 0.9
-	// move closer
-	moveForTime(100, 100, forward)
-	// arm down
-	if (laji==1 || laji==2) {
-            setPwmServo(startbit_servorange.range1, 1, 180, 800)
-	} else if (laji==3) {
-            setPwmServo(startbit_servorange.range1, 1, 170, 800)
-	} else {
-            setPwmServo(startbit_servorange.range1, 1, 160, 800)
-	}
-	basic.pause(1000)
-	// claw open
-	setPwmServo(startbit_servorange.range1, 4, 0, 300)
-	basic.pause(500)
-	// backward a little
-	moveForTime(-100, -100, forward)
-	// arm up
-	setPwmServo(startbit_servorange.range1, 1, 35, 500)
-	basic.pause(700)
-	// backward
-	moveForTime(-100, -100, 0.8)
-	// back to line
-	followForTime(10)
+    export function fourInfraredGrab(laji: number) {
+        // follow first to be stable
+        let forward = 2.3
+        fourInfraredFollow(1.5)
+        if (laji == 1) { //battery narrow
+            // arm down
+            setPwmServo(startbit_servorange.range1, 1, 180, 300)
+            // claw open
+            setPwmServo(startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            // move closer
+            fourInfraredFollow(forward - 1.5)
+            // claw close
+            setPwmServo(startbit_servorange.range1, 4, 70, 300)
+            basic.pause(500)
+        } else if (laji == 2) { //battery wide
+            // arm down
+            setPwmServo(startbit_servorange.range1, 1, 180, 300)
+            // claw open
+            setPwmServo(startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            // move closer
+            fourInfraredFollow(forward - 1.5)
+            // claw close
+            setPwmServo(startbit_servorange.range1, 4, 65, 300)
+            basic.pause(500)
+        } else if (laji == 3) { //cup
+            // arm down
+            setPwmServo(startbit_servorange.range1, 1, 170, 300)
+            // claw open
+            setPwmServo(startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            // move closer
+            fourInfraredFollow(forward - 1.5)
+            // claw close
+            setPwmServo(startbit_servorange.range1, 4, 45, 300)
+            basic.pause(500)
+        } else { //tin
+            // arm down
+            setPwmServo(startbit_servorange.range1, 1, 160, 300)
+            // claw open
+            setPwmServo(startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            // move closer
+            fourInfraredFollow(forward - 1.5)
+            // claw close
+            setPwmServo(startbit_servorange.range1, 4, 55, 300)
+            basic.pause(500)
+        }
+        // arm up
+        setPwmServo(startbit_servorange.range1, 1, 35, 800)
+        basic.pause(1000)
+        // to crossroad
+        fourInfraredFollow(10)
     }
 
-    //% weight=14 blockId=moveTillFound blockGap=50 block="tan$speed1$speed2$time$sensor$color"
-    /* 以电机1速度$speed1和电机2速度$speed2移动$time秒或直到$sensor找到$line" */
+    //% weight=15 blockId=fourInfraredDrop block="hwFang$laji"
+    /* "放下垃圾编号$laji" */
+    //% laji.min=1 laji.max=4 laji.defl=1
+    //% subcategory=Sensor
+    export function fourInfraredDrop(laji: number) {
+        let forward = 0.9
+        // move closer
+        moveForTime(100, 100, forward)
+        // arm down
+        if (laji == 1 || laji == 2) {
+            setPwmServo(startbit_servorange.range1, 1, 180, 800)
+        } else if (laji == 3) {
+            setPwmServo(startbit_servorange.range1, 1, 170, 800)
+        } else {
+            setPwmServo(startbit_servorange.range1, 1, 160, 800)
+        }
+        basic.pause(1000)
+        // claw open
+        setPwmServo(startbit_servorange.range1, 4, 0, 300)
+        basic.pause(500)
+        // backward a little
+        moveForTime(-100, -100, forward)
+        // arm up
+        setPwmServo(startbit_servorange.range1, 1, 35, 500)
+        basic.pause(700)
+        // backward
+        moveForTime(-100, -100, 0.8)
+        // back to line
+        fourInfraredFollow(10)
+    }
+
+    //% weight=14 blockId=fourInfraredMoveTillFound block="hwTan$speed1$speed2$time$sensor$color"
+    /* "电机1$speed1电机2$speed2行进$time秒直到传感器$sensor找到$color线" */
     //% speed1.min=-100 speed1.max=100 speed1.defl=60 speed2.min=-100 speed2.max=100 speed2.defl=60 time.min=0 time.defl=2
     //% inlineInputMode=inline
     //% subcategory=Sensor
-    export function moveTillFound(speed1: number, speed2: number, time: number, sensor: startbit_LineFollowerSensors, color: startbit_LineColor): boolean {
+    function fourInfraredMoveTillFound(speed1: number, speed2: number, time: number, sensor: startbit_LineFollowerSensors, color: startbit_LineColor): boolean {
         let found = false
         let startTime = input.runningTime()
         while (input.runningTime() - startTime < time * 1000) {
@@ -2183,66 +2398,66 @@ namespace StartbitV2 {
         return found
     }
 
-    //% weight=13 blockId=findLine blockGap=50 block="diu$wiggle$forward"
-    /* "以速度$speed找线，摆动$wiggle秒，前进$forward秒" */
+    //% weight=13 blockId=fourInfraredFindLine block="hwDiu w $wiggle f $forward"
+    /* "尝试摆动$wiggle秒，前进$forward秒找回线" */
     //% wiggle.defl = 0.4 forward.defl = 0.8
     //% subcategory=Sensor
-    export function findLine(wiggle: number, forward: number) {
-	let speed = 80
+    function fourInfraredFindLine(wiggle: number, forward: number) {
+        let speed = 80
         // already on black line?
         let s = sensorsOnBlack()
         if (s[1] || s[2]) {
             return
         }
-	    
-	// try front
-        if (moveTillFound(speed, speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
+
+        // try front
+        if (fourInfraredMoveTillFound(speed, speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
         // move back
-        if (moveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
+        if (fourInfraredMoveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
-	    
+
         // try left
-        if (moveTillFound(speed, -speed, wiggle, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
+        if (fourInfraredMoveTillFound(speed, -speed, wiggle, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
         // move forward
-        if (moveTillFound(speed, speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
+        if (fourInfraredMoveTillFound(speed, speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
         // move back
-        if (moveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
+        if (fourInfraredMoveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
-	
+
         // try right
-        if (moveTillFound(-speed, speed, wiggle * 2, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
+        if (fourInfraredMoveTillFound(-speed, speed, wiggle * 2, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
         // move forward
-        if (moveTillFound(speed, speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
+        if (fourInfraredMoveTillFound(speed, speed, forward, startbit_LineFollowerSensors.S3, startbit_LineColor.Black)) {
             return
         }
         // not found
-        if (moveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
+        if (fourInfraredMoveTillFound(-speed, -speed, forward, startbit_LineFollowerSensors.S2, startbit_LineColor.Black)) {
             return
         }
     }
 
-    //% weight=12 blockId=pFollowForTime blockGap=50 block="p$time"
-    /* "以速度$speed进行P巡线$time秒" */
+    //% weight=12 blockId=fourInfraredPFollow blockGap=50 block="hwPZhi $time"
+    /* "P巡线$time秒" */
     //% time.min=0 time.max=100 time.defl=10
     //% subcategory=Sensor
-    export function pFollowForTime(time: number): void {
+    export function fourInfraredPFollow(time: number): void {
         let startTime = input.runningTime()
-	let s = [false, false, false, false]
-	let error = 0
-	let interror = 0
-	let speed = 80
-	let kp = 90
-	let ki = 0.04
+        let s = [false, false, false, false]
+        let error = 0
+        let interror = 0
+        let speed = 80
+        let kp = 90
+        let ki = 0.04
         let speed1 = 0
         let speed2 = 0
         while ((input.runningTime() - startTime < time * 1000)) {
@@ -2250,12 +2465,12 @@ namespace StartbitV2 {
             if (s[0] && s[3]) {
                 break
             }
-	    error = 0
-	    if (s[0]) { error = error - 3 }
-	    if (s[1]) { error = error - 1 }
-	    if (s[2]) { error = error + 1 }
-	    if (s[3]) { error = error + 3 }
-	    interror = interror + error
+            error = 0
+            if (s[0]) { error = error - 3 }
+            if (s[1]) { error = error - 1 }
+            if (s[2]) { error = error + 1 }
+            if (s[3]) { error = error + 3 }
+            interror = interror + error
             speed1 = Math.min(Math.max(speed - kp * error - ki * interror, -100), 100)
             speed2 = Math.min(Math.max(speed + kp * error + ki * interror, -100), 100)
             startbit_setMotorSpeed(speed1, speed2)
