@@ -1965,7 +1965,6 @@ namespace StartbitV2 {
 
 
     let sigma = 150
-    let error = 0
     let startTime = 0
     let graceTime = 0.4
     let smoothAlpha = 0.2
@@ -2006,6 +2005,7 @@ namespace StartbitV2 {
     //% subcategory=Sensor
     export function singleGrayFollow(time: number, median: number, sigma: number) {
         let kp = 1
+	let error = 0
         let speed = 100
         let speed1 = 0
         let speed2 = 0
@@ -2022,9 +2022,9 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% block="isLu?"
+    //% block="isLu? $error"
     //% advanced=true
-    export function isCrossroad() {
+    export function isCrossroad(error: number) {
         smoothError = smoothAlpha * error + (1 - smoothAlpha) * smoothError
         if (control.millis() - startTime > graceTime * 1000) {
             if (smoothError > sigma) {
