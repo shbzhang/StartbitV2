@@ -1961,24 +1961,38 @@ namespace StartbitV2 {
         return status;
     }
 
+
+
+
+    let sigma = 150
+    let error = 0
+    let startTime = 0
+    let graceTime = 0.4
+    let smoothAlpha = 0.2
+    let smoothError = 0
+    let onBlack = 0
+    let onWhite = 0
+    let maxOnBlack = 200
+    let maxOnWhite = 200
+
     //% weight=30 blockId=calibrateSensor block="gdCe"
     /* "转圈记录光电读数，计算中值、偏差" */
     //% subcategory=Sensor
     export function calibrateSensor() {
-        let s = 0
+        let sensorValue = 0
         let maxValue = -100
         let minValue = 10000
         let startTime = control.millis()
-        startbit_setMotorSpeed(0, 100)
+        StartbitV2.startbit_setMotorSpeed(0, 100)
         while (control.millis() - startTime < 10 * 1000) {
-            s = pins.analogReadPin(AnalogPin.P2)
-            if (s > maxValue) { maxValue = s }
-            if (s < minValue) { minValue = s }
+            sensorValue = pins.analogReadPin(AnalogPin.P2)
+            if (sensorValue > maxValue) { maxValue = sensorValue }
+            if (sensorValue < minValue) { minValue = sensorValue }
         }
-        startbit_setMotorSpeed(0, 0)
+        StartbitV2.startbit_setMotorSpeed(0, 0)
         basic.pause(20)
 
-        for (let i=0; i<4; i++) {
+        for (let i = 0; i < 4; i++) {
             basic.showNumber((maxValue + minValue) / 2)
             basic.pause(1500)
             basic.showNumber((maxValue - minValue) / 4)
@@ -1990,46 +2004,47 @@ namespace StartbitV2 {
     /* "巡线$time秒，中值$median 偏差$sigma" */
     //% time.defl=10 median.defl=400 sigma.defl=150
     //% subcategory=Sensor
-    export function singleGrayFollow(time: number, median:number, sigma:number) {
+    export function singleGrayFollow(time: number, median: number, sigma: number) {
         let kp = 1
         let speed = 100
-        let error = 0
         let speed1 = 0
         let speed2 = 0
-        let onBlack = 0
-        let onWhite = 0
-        let maxOnBlack = 200
-        let maxOnWhite = 200
-        let smoothError = 0
-        let smoothAlpha = 0.2
-        let graceTime = 0.4
-        let startTime = control.millis()
+        startTime = control.millis()
         while (control.millis() - startTime < time * 1000) {
             error = pins.analogReadPin(AnalogPin.P2) - median
 
-            smoothError = smoothAlpha * error + (1-smoothAlpha) * smoothError
-            if (control.millis() - startTime > graceTime * 1000) {
-                if (smoothError > sigma) {
-                    onWhite++
-                    onBlack = 0
-                } else if (smoothError < -sigma) {
-                    onWhite = 0
-                    onBlack++
-                } else {
-                    onWhite = 0
-                    onBlack = 0
-                }
-                
-                if (onBlack > maxOnBlack || onWhite > maxOnWhite) {
-                    break
-                }
-            }
+            if (isCrossroad()) {break}
             speed1 = Math.constrain(speed - kp * error, -100, 100)
             speed2 = Math.constrain(speed + kp * error, -100, 100)
-            startbit_setMotorSpeed(speed1, speed2)
+            StartbitV2.startbit_setMotorSpeed(speed1, speed2)
         }
-        startbit_setMotorSpeed(0, 0)
+        StartbitV2.startbit_setMotorSpeed(0, 0)
         basic.pause(20)
+    }
+
+    //% block="isLu?"
+    //% advanced=true
+    export function isCrossroad() {
+        smoothError = smoothAlpha * error + (1 - smoothAlpha) * smoothError
+        if (control.millis() - startTime > graceTime * 1000) {
+            if (smoothError > sigma) {
+                onWhite++
+                onBlack = 0
+            } else if (smoothError < -sigma) {
+                onWhite = 0
+                onBlack++
+            } else {
+                onWhite = 0
+                onBlack = 0
+            }
+            if (onBlack > maxOnBlack || onWhite > maxOnWhite) {
+                onWhite = 0
+                onBlack = 0
+                smoothError = 0
+                return true
+            }
+        }
+        return false
     }
 
     //% weight=28 blockId=singleGrayCrossroads block="gdLu d $direct m $median"
