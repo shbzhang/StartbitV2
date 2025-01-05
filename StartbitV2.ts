@@ -1965,7 +1965,6 @@ namespace StartbitV2 {
 
 
     let sigma = 150
-    let startTime = 0
     let graceTime = 0.4
     let smoothAlpha = 0.2
     let smoothError = 0
@@ -1982,13 +1981,13 @@ namespace StartbitV2 {
         let maxValue = -100
         let minValue = 10000
         let startTime = control.millis()
-        StartbitV2.startbit_setMotorSpeed(0, 100)
+        startbit_setMotorSpeed(0, 100)
         while (control.millis() - startTime < 10 * 1000) {
             sensorValue = pins.analogReadPin(AnalogPin.P2)
             if (sensorValue > maxValue) { maxValue = sensorValue }
             if (sensorValue < minValue) { minValue = sensorValue }
         }
-        StartbitV2.startbit_setMotorSpeed(0, 0)
+        startbit_setMotorSpeed(0, 0)
         basic.pause(20)
 
         for (let i = 0; i < 4; i++) {
@@ -1999,32 +1998,32 @@ namespace StartbitV2 {
         }
     }
 
-    //% weight=29 blockId=singleGrayFollow block="gdZhi t $time m $median s $sigma"
-    //% time.defl=10 median.defl=400 sigma.defl=150
+    //% weight=29 blockId=singleGrayFollow block="gdZhi t $time m $median"
+    //% time.defl=10 median.defl=400
     //% subcategory=Sensor
-    export function singleGrayFollow(time: number, median: number, sigma: number) {
-	/* "巡线$time秒，中值$median 偏差$sigma" */
+    export function singleGrayFollow(time: number, median: number) {
+	/* "巡线$time秒，中值$median" */
         let kp = 1
 	let error = 0
         let speed = 100
         let speed1 = 0
         let speed2 = 0
-        startTime = control.millis()
+        let startTime = control.millis()
         while (control.millis() - startTime < time * 1000) {
             error = pins.analogReadPin(AnalogPin.P2) - median
 
-            if (isCrossroad(error)) {break}
+            if (isCrossroad(error, startTime)) {break}
             speed1 = Math.constrain(speed - kp * error, -100, 100)
             speed2 = Math.constrain(speed + kp * error, -100, 100)
-            StartbitV2.startbit_setMotorSpeed(speed1, speed2)
+            startbit_setMotorSpeed(speed1, speed2)
         }
-        StartbitV2.startbit_setMotorSpeed(0, 0)
+        startbit_setMotorSpeed(0, 0)
         basic.pause(20)
     }
 
-    //% weight=31 blockId=isCrossroad block="isLu? $error"
+    //% weight=31 blockId=isCrossroad block="isLu? e$error t$startTime"
     //% subcategory=Sensor
-    export function isCrossroad(error: number) {
+    export function isCrossroad(error: number, startTime: number) {
         smoothError = smoothAlpha * error + (1 - smoothAlpha) * smoothError
         if (control.millis() - startTime > graceTime * 1000) {
             if (smoothError > sigma) {
@@ -2106,14 +2105,14 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% weight=26 blockId=singleGrayGrab block="gdZhua lj $laji m $median s $sigma"
-    //% laj.min=1 laji.max=4 laji.defl=1 median.defl=400 sigma.defl=150
+    //% weight=26 blockId=singleGrayGrab block="gdZhua lj $laji m $median"
+    //% laj.min=1 laji.max=4 laji.defl=1 median.defl=400
     //% subcategory=Sensor
-    export function singleGrayGrab(laji: number, median: number, sigma: number) {
-        /* "抓起垃圾编号$laji，中值$median 偏差$sigma" */
+    export function singleGrayGrab(laji: number, median: number) {
+        /* "抓起垃圾编号$laji，中值$median" */
         // follow first to be stable
         let forward = 2.3
-        singleGrayFollow(1.5, median, sigma)
+        singleGrayFollow(1.5, median)
         if (laji == 1) { //battery narrow
             // arm down
             setPwmServo(startbit_servorange.range1, 1, 180, 300)
@@ -2121,7 +2120,7 @@ namespace StartbitV2 {
             setPwmServo(startbit_servorange.range1, 4, 0, 300)
             basic.pause(500)
             // move closer
-            singleGrayFollow(forward - 1.5, median, sigma)
+            singleGrayFollow(forward - 1.5, median)
             // claw close
             setPwmServo(startbit_servorange.range1, 4, 75, 300)
             basic.pause(500)
@@ -2132,7 +2131,7 @@ namespace StartbitV2 {
             setPwmServo(startbit_servorange.range1, 4, 0, 300)
             basic.pause(500)
             // move closer
-            singleGrayFollow(forward - 1.5, median, sigma)
+            singleGrayFollow(forward - 1.5, median)
             // claw close
             setPwmServo(startbit_servorange.range1, 4, 70, 300)
             basic.pause(500)
@@ -2143,7 +2142,7 @@ namespace StartbitV2 {
             setPwmServo(startbit_servorange.range1, 4, 0, 300)
             basic.pause(500)
             // move closer
-            singleGrayFollow(forward - 1.5, median, sigma)
+            singleGrayFollow(forward - 1.5, median)
             // claw close
             setPwmServo(startbit_servorange.range1, 4, 45, 300)
             basic.pause(500)
@@ -2154,7 +2153,7 @@ namespace StartbitV2 {
             setPwmServo(startbit_servorange.range1, 4, 0, 300)
             basic.pause(500)
             // move closer
-            singleGrayFollow(forward - 1.5, median, sigma)
+            singleGrayFollow(forward - 1.5, median)
             // claw close
             setPwmServo(startbit_servorange.range1, 4, 55, 300)
             basic.pause(500)
@@ -2163,7 +2162,7 @@ namespace StartbitV2 {
         setPwmServo(startbit_servorange.range1, 1, 35, 800)
         basic.pause(1000)
         // to crossroad
-        singleGrayFollow(10, median, sigma)
+        singleGrayFollow(10, median)
     }
 
     //% weight=25 blockId=singleGrayDrop block="gdFang lj $laji m $median"
