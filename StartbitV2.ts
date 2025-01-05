@@ -1975,9 +1975,9 @@ namespace StartbitV2 {
     let maxOnWhite = 200
 
     //% weight=30 blockId=calibrateSensor block="gdCe"
-    /* "转圈记录光电读数，计算中值、偏差" */
     //% subcategory=Sensor
     export function calibrateSensor() {
+	/* "转圈记录光电读数，计算中值、偏差" */
         let sensorValue = 0
         let maxValue = -100
         let minValue = 10000
@@ -2000,10 +2000,10 @@ namespace StartbitV2 {
     }
 
     //% weight=29 blockId=singleGrayFollow block="gdZhi t $time m $median s $sigma"
-    /* "巡线$time秒，中值$median 偏差$sigma" */
     //% time.defl=10 median.defl=400 sigma.defl=150
     //% subcategory=Sensor
     export function singleGrayFollow(time: number, median: number, sigma: number) {
+	/* "巡线$time秒，中值$median 偏差$sigma" */
         let kp = 1
 	let error = 0
         let speed = 100
@@ -2022,8 +2022,8 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% block="isLu? $error"
-    //% advanced=true
+    //% weight=31 blockId=isCrossroad block="isLu? $error"
+    //% subcategory=Sensor
     export function isCrossroad(error: number) {
         smoothError = smoothAlpha * error + (1 - smoothAlpha) * smoothError
         if (control.millis() - startTime > graceTime * 1000) {
@@ -2048,10 +2048,10 @@ namespace StartbitV2 {
     }
 
     //% weight=28 blockId=singleGrayCrossroads block="gdLu d $direct m $median"
-    /* "路口向$direct 中值$median" */
     //% direct.defl=1 median.defl=400
     //% subcategory=Sensor
     export function singleGrayCrossroads(direct: number, median: number) {
+        /* "路口向$direct 中值$median" */
         startbit_setMotorSpeed(100, 100)
         basic.pause(300)
         startbit_setMotorSpeed(0, 0)
@@ -2095,10 +2095,10 @@ namespace StartbitV2 {
     }
 
     //% weight=27 blockId=singleGrayStopAtBlack block="gdZhaoHei m $median"
-    /* "前进至黑线 中值$median" */
     //% median.defl=400
     //% subcategory=Sensor
     export function singleGrayStopAtBlack(median: number) {
+        /* "前进至黑线 中值$median" */
         while (pins.analogReadPin(AnalogReadWritePin.P2) > median) {
             startbit_setMotorSpeed(100, 100)
         }
@@ -2107,10 +2107,10 @@ namespace StartbitV2 {
     }
 
     //% weight=26 blockId=singleGrayGrab block="gdZhua lj $laji m $median s $sigma"
-    /* "抓起垃圾编号$laji，中值$median 偏差$sigma" */
     //% laj.min=1 laji.max=4 laji.defl=1 median.defl=400 sigma.defl=150
     //% subcategory=Sensor
     export function singleGrayGrab(laji: number, median: number, sigma: number) {
+        /* "抓起垃圾编号$laji，中值$median 偏差$sigma" */
         // follow first to be stable
         let forward = 2.3
         singleGrayFollow(1.5, median, sigma)
@@ -2167,11 +2167,11 @@ namespace StartbitV2 {
     }
 
     //% weight=25 blockId=singleGrayDrop block="gdFang lj $laji m $median"
-    /* "放下垃圾编号$laji" */
     //% laj.min=1 laji.max=4 laji.defl=1 median.defl=400
     //% subcategory=Sensor
     export function singleGrayDrop(laji: number, median: number) {
-        let forward = 0.9
+        /* "放下垃圾编号$laji" */
+	let forward = 0.9
         // move closer
         moveForTime(100, 100, forward)
         // arm down
@@ -2198,10 +2198,10 @@ namespace StartbitV2 {
     }
 
     //% weight=24 blockId=moveForTime blockGap=50 block="dong $speed1 $speed2 $time"
-    /* "电机1$speed1电机2$speed2行进$time秒" */
     //% speed1.min=-100 speed1.max=100 speed1.defl=100 speed2.min=-100 speed2.max=100 speed2.defl=100 time.min=0 time.defl=1
     //% subcategory=Sensor
     export function moveForTime(speed1: number, speed2: number, time: number): void {
+        /* "电机1$speed1电机2$speed2行进$time秒" */
         startbit_setMotorSpeed(speed1, speed2)
         basic.pause(time * 1000)
         startbit_setMotorSpeed(0, 0)
@@ -2211,7 +2211,7 @@ namespace StartbitV2 {
 
     //% weight=20 blockId=sensorsOnBlack block="四路巡线模块在黑线上？"
     //% subcategory=Sensor
-    export function sensorsOnBlack(): boolean[] {
+    function sensorsOnBlack(): boolean[] {
         let s1 = startbit_line_followers(startbit_LineFollowerSensors.S1, startbit_LineColor.Black);
         let s2 = startbit_line_followers(startbit_LineFollowerSensors.S2, startbit_LineColor.Black);
         let s3 = startbit_line_followers(startbit_LineFollowerSensors.S3, startbit_LineColor.Black);
@@ -2220,11 +2220,11 @@ namespace StartbitV2 {
     }
 
     //% weight=19 blockId=fourInfraredFollow block="hwZhi$time"
-    /*"巡线$time秒"*/
     //% time.min=0 time.max=100 time.defl=10
     /*speed.min=-100 speed.max=100 speed.defl=100*/
     //% subcategory=Sensor
-    export function fourInfraredFollow(time: number): void {
+    function fourInfraredFollow(time: number): void {
+        /*"巡线$time秒"*/
         let speed = 100
         let startTime = input.runningTime()
         let s = [false, false, false, false]
@@ -2253,11 +2253,11 @@ namespace StartbitV2 {
     }
 
     //% weight=18 blockId=fourInfraredCrossroads block="hwLu$direct"
-    /*"路口向$direct"*/
     //% direct.min=1 direct.max=4, direct.defl=2
     /*speed.min=0 speed.max=100 speed.defl=100*/
     //% subcategory=Sensor
-    export function fourInfraredCrossroads(direct: number) {
+    function fourInfraredCrossroads(direct: number) {
+        /*"路口向$direct"*/
         let speed = 100
         // stop at crossroad
         //fourInfraredFollow(10)
@@ -2301,12 +2301,10 @@ namespace StartbitV2 {
     }
 
     //% weight=16 blockId=fourInfraredGrab block="hwZhua$laji"
-    /* "抓起垃圾编号$laji" */
     //% laj.min=1 laji.max=90 laji.defl=1 forward.defl=2.2
-    /* angle.min=10 angle.max=90 angle.defl=75 */
-    /* forward.min=0, forward.max=3, forward.defl=2.2 */
     //% subcategory=Sensor
-    export function fourInfraredGrab(laji: number) {
+    function fourInfraredGrab(laji: number) {
+        /* "抓起垃圾编号$laji" */
         // follow first to be stable
         let forward = 2.3
         fourInfraredFollow(1.5)
@@ -2363,10 +2361,10 @@ namespace StartbitV2 {
     }
 
     //% weight=15 blockId=fourInfraredDrop block="hwFang$laji"
-    /* "放下垃圾编号$laji" */
     //% laji.min=1 laji.max=4 laji.defl=1
     //% subcategory=Sensor
-    export function fourInfraredDrop(laji: number) {
+    function fourInfraredDrop(laji: number) {
+        /* "放下垃圾编号$laji" */
         let forward = 0.9
         // move closer
         moveForTime(100, 100, forward)
@@ -2394,11 +2392,11 @@ namespace StartbitV2 {
     }
 
     //% weight=14 blockId=fourInfraredMoveTillFound block="hwTan$speed1$speed2$time$sensor$color"
-    /* "电机1$speed1电机2$speed2行进$time秒直到传感器$sensor找到$color线" */
     //% speed1.min=-100 speed1.max=100 speed1.defl=60 speed2.min=-100 speed2.max=100 speed2.defl=60 time.min=0 time.defl=2
     //% inlineInputMode=inline
     //% subcategory=Sensor
     function fourInfraredMoveTillFound(speed1: number, speed2: number, time: number, sensor: startbit_LineFollowerSensors, color: startbit_LineColor): boolean {
+        /* "电机1$speed1电机2$speed2行进$time秒直到传感器$sensor找到$color线" */
         let found = false
         let startTime = input.runningTime()
         while (input.runningTime() - startTime < time * 1000) {
@@ -2414,10 +2412,10 @@ namespace StartbitV2 {
     }
 
     //% weight=13 blockId=fourInfraredFindLine block="hwDiu w $wiggle f $forward"
-    /* "尝试摆动$wiggle秒，前进$forward秒找回线" */
     //% wiggle.defl = 0.4 forward.defl = 0.8
     //% subcategory=Sensor
     function fourInfraredFindLine(wiggle: number, forward: number) {
+        /* "尝试摆动$wiggle秒，前进$forward秒找回线" */
         let speed = 80
         // already on black line?
         let s = sensorsOnBlack()
@@ -2462,10 +2460,10 @@ namespace StartbitV2 {
     }
 
     //% weight=12 blockId=fourInfraredPFollow blockGap=50 block="hwPZhi $time"
-    /* "P巡线$time秒" */
     //% time.min=0 time.max=100 time.defl=10
     //% subcategory=Sensor
-    export function fourInfraredPFollow(time: number): void {
+    function fourInfraredPFollow(time: number): void {
+        /* "P巡线$time秒" */
         let startTime = input.runningTime()
         let s = [false, false, false, false]
         let error = 0
