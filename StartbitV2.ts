@@ -2013,7 +2013,7 @@ namespace StartbitV2 {
         while (control.millis() - startTime < time * 1000) {
             error = pins.analogReadPin(AnalogPin.P2) - median
 
-            if (isCrossroad()) {break}
+            if (isCrossroad(error)) {break}
             speed1 = Math.constrain(speed - kp * error, -100, 100)
             speed2 = Math.constrain(speed + kp * error, -100, 100)
             StartbitV2.startbit_setMotorSpeed(speed1, speed2)
