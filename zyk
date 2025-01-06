@@ -1,0 +1,164 @@
+function dong (m1: number, m2: number, time: number) {
+    StartbitV2.startbit_setMotorSpeed(m1, m2)
+    basic.pause(time * 1000)
+    StartbitV2.startbit_setMotorSpeed(0, 0)
+    basic.pause(20)
+}
+function find () {
+    while (pins.analogReadPin(AnalogPin.P2) > m) {
+        StartbitV2.startbit_setMotorSpeed(100, 100)
+    }
+    StartbitV2.startbit_setMotorSpeed(0, 0)
+    basic.pause(20)
+}
+function zhi (time: number) {
+    black = 0
+    white = 0
+    se = 0
+    kai = control.millis()
+    while (control.millis() - kai < time * 1000) {
+        e = pins.analogReadPin(AnalogPin.P2) - m
+        se = 0.2 * e + 0.8 * se
+        if (control.millis() - kai > 400) {
+            if (se > s) {
+                white += 1
+                black = 0
+            } else if (se < 0 - s) {
+                white = 0
+                black += 1
+            } else {
+                white = 0
+                black = 0
+            }
+            if (black > 200 || white > 200) {
+                break;
+            }
+        }
+        StartbitV2.startbit_setMotorSpeed(Math.constrain(100 - e, -100, 100), Math.constrain(100 + e, -100, 100))
+    }
+    StartbitV2.startbit_setMotorSpeed(0, 0)
+    basic.pause(20)
+}
+function lu (fx: number) {
+    StartbitV2.startbit_setMotorSpeed(100, 100)
+    basic.pause(300)
+    StartbitV2.startbit_setMotorSpeed(0, 0)
+    basic.pause(20)
+    if (fx == 1) {
+        StartbitV2.startbit_setMotorSpeed(100, -100)
+        basic.pause(300)
+        while (pins.analogReadPin(AnalogPin.P2) > m) {
+        	
+        }
+        basic.pause(200)
+    } else if (fx == 2) {
+        while (pins.analogReadPin(AnalogPin.P2) > m) {
+            StartbitV2.startbit_setMotorSpeed(-100, 100)
+        }
+    } else if (fx == 3) {
+        StartbitV2.startbit_setMotorSpeed(-100, 100)
+        basic.pause(800)
+        while (pins.analogReadPin(AnalogPin.P2) > m) {
+        	
+        }
+    } else {
+        StartbitV2.startbit_setMotorSpeed(100, -100)
+        basic.pause(1500)
+        while (pins.analogReadPin(AnalogPin.P2) > m) {
+        	
+        }
+        basic.pause(200)
+    }
+    StartbitV2.startbit_setMotorSpeed(0, 0)
+    basic.pause(20)
+}
+function fang (laji: number) {
+    dong(100, 100, 0.9)
+    if (laji == 1 || laji == 2) {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 800)
+    } else if (laji == 3) {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 170, 800)
+    } else {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 160, 800)
+    }
+    basic.pause(1000)
+    StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+    basic.pause(500)
+    dong(-100, -100, 0.9)
+    StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 300)
+    basic.pause(500)
+    dong(-100, -100, 0.9)
+    find()
+}
+function zhua (laji: number) {
+    zhi(1.5)
+    if (laji == 1) {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 300)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+        basic.pause(500)
+        zhi(0.8)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 75, 300)
+        basic.pause(500)
+    } else if (laji == 2) {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 300)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+        basic.pause(500)
+        zhi(0.8)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 70, 300)
+        basic.pause(500)
+    } else if (laji == 3) {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 170, 300)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+        basic.pause(500)
+        zhi(0.8)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 45, 300)
+        basic.pause(500)
+    } else {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 160, 300)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+        basic.pause(500)
+        zhi(0.8)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 55, 300)
+        basic.pause(500)
+    }
+    StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 800)
+    basic.pause(1000)
+    zhi(10)
+}
+function ce () {
+    da = -100
+    xiao = 10000
+    kai = control.millis()
+    StartbitV2.startbit_setMotorSpeed(0, 100)
+    while (control.millis() - kai < 10000) {
+        du = pins.analogReadPin(AnalogPin.P2)
+        if (du > da) {
+            da = du
+        }
+        if (du < xiao) {
+            xiao = du
+        }
+    }
+    StartbitV2.startbit_setMotorSpeed(0, 0)
+    basic.pause(20)
+    for (let index = 0; index < 4; index++) {
+        basic.showNumber((da + xiao) / 2)
+        basic.pause(1500)
+        basic.showNumber((da - xiao) / 4)
+        basic.pause(1500)
+    }
+}
+let du = 0
+let xiao = 0
+let da = 0
+let e = 0
+let kai = 0
+let se = 0
+let white = 0
+let black = 0
+let m = 0
+let s = 0
+s = 150
+m = 400
+StartbitV2.startbit_Init()
+StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 800)
