@@ -2165,6 +2165,20 @@ namespace StartbitV2 {
         singleGrayFollow(10, median)
     }
 
+    //% weight=24 blockId=checkLabel block="biao"
+    //% subcategory=Sensor
+    export function checkLabel(): number {
+        if (pins.analogReadPin(AnalogReadWritePin.P2) > 400) {
+            StartbitV2.startbit_setMotorSpeed(100, 0)
+            basic.pause(300)
+            return 1
+        } else {
+            StartbitV2.startbit_setMotorSpeed(0, 100)
+            basic.pause(300)
+            return 2
+        }
+    }
+
     //% weight=25 blockId=singleGrayDrop block="gdFang lj $laji m $median"
     //% laj.min=1 laji.max=4 laji.defl=1 median.defl=400
     //% subcategory=Sensor
