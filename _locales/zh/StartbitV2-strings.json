@@ -195,4 +195,12 @@
 	"StartbitV2.startbit_MP3_SINGLE_LOOP|block":"MP3模块单曲循环 |%state",
 	"StartbitV2.startbit_MP3_PLAY_NUM|block":"MP3模块播放序号|%num 歌曲",
 	"StartbitV2.startbit_getSoundLevel|block":"获取音量等级(0~255)"
+	"StartbitV2.calibrateSensor|block":"光电传感器校准"
+	"StartbitV2.singleGrayFollow|block":"光电传感器- |时间 %time |中值 %median"
+	"StartbitV2.isCrossroad|block":"异常检测 |差 %error |中值 %median"
+	"StartbitV2.singleGrayCrossroads|block":"光电传感器+ |方向 %direct |中值 %median"
+	"StartbitV2.singleGrayStopAtBlack|block":"搜寻 |中值 %median"
+	"StartbitV2.singleGrayGrab|block":"舵机抬起 |编号 %laji |中值 %median"
+	"StartbitV2.singleGrayDrop|block":"舵机降低 |编号 %laji |中值 %median"
+	"StartbitV2.moveForTime|block":"设置|电机1 %speed1 |电机2 %speed2 |时间 %time"
 }
