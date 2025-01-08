@@ -2633,6 +2633,17 @@ function zhua (index: number) {
     basic.pause(1000)
     zhi(10)
 }
+function biao(): number {
+	if (pins.analogReadPin(AnalogPin.P2) > 400) {
+	    StartbitV2.startbit_setMotorSpeed(100, 0)
+	    basic.pause(300)
+	    return 1
+	} else {
+	    StartbitV2.startbit_setMotorSpeed(0, 100)
+	    basic.pause(300)
+	    return 2
+	}
+}
 function ce () {
     da = -100
     xiao = 10000
