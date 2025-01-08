@@ -2105,15 +2105,15 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% weight=26 blockId=singleGrayGrab block="gdZhua lj $laji m $median"
-    //% laj.min=1 laji.max=4 laji.defl=1 median.defl=400
+    //% weight=26 blockId=singleGrayGrab block="gdZhua lj $index m $median"
+    //% index.min=1 index.max=4 index.defl=1 median.defl=400
     //% subcategory=Sensor
-    export function singleGrayGrab(laji: number, median: number) {
-        /* "抓起垃圾编号$laji，中值$median" */
+    export function singleGrayGrab(index: number, median: number) {
+        /* "抓起垃圾编号$index，中值$median" */
         // follow first to be stable
         let forward = 2.3
         singleGrayFollow(1.5, median)
-        if (laji == 1) { //battery narrow
+        if (index == 1) { //battery narrow
             // arm down
             setPwmServo(startbit_servorange.range1, 1, 180, 300)
             // claw open
@@ -2124,7 +2124,7 @@ namespace StartbitV2 {
             // claw close
             setPwmServo(startbit_servorange.range1, 4, 75, 300)
             basic.pause(500)
-        } else if (laji == 2) { //battery wide
+        } else if (index == 2) { //battery wide
             // arm down
             setPwmServo(startbit_servorange.range1, 1, 180, 300)
             // claw open
@@ -2135,7 +2135,7 @@ namespace StartbitV2 {
             // claw close
             setPwmServo(startbit_servorange.range1, 4, 70, 300)
             basic.pause(500)
-        } else if (laji == 3) { //cup
+        } else if (index == 3) { //cup
             // arm down
             setPwmServo(startbit_servorange.range1, 1, 170, 300)
             // claw open
@@ -2179,18 +2179,18 @@ namespace StartbitV2 {
         }
     }
 
-    //% weight=25 blockId=singleGrayDrop block="gdFang lj $laji m $median"
-    //% laj.min=1 laji.max=4 laji.defl=1 median.defl=400
+    //% weight=25 blockId=singleGrayDrop block="gdFang lj $index m $median"
+    //% index.min=1 index.max=4 index.defl=1 median.defl=400
     //% subcategory=Sensor
-    export function singleGrayDrop(laji: number, median: number) {
-        /* "放下垃圾编号$laji" */
+    export function singleGrayDrop(index: number, median: number) {
+        /* "放下垃圾编号$index" */
 	let forward = 0.9
         // move closer
         moveForTime(100, 100, forward)
         // arm down
-        if (laji == 1 || laji == 2) {
+        if (index == 1 || index == 2) {
             setPwmServo(startbit_servorange.range1, 1, 180, 800)
-        } else if (laji == 3) {
+        } else if (index == 3) {
             setPwmServo(startbit_servorange.range1, 1, 170, 800)
         } else {
             setPwmServo(startbit_servorange.range1, 1, 160, 800)
@@ -2313,15 +2313,15 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% weight=16 blockId=fourInfraredGrab block="hwZhua$laji"
-    //% laj.min=1 laji.max=90 laji.defl=1 forward.defl=2.2
+    //% weight=16 blockId=fourInfraredGrab block="hwZhua$index"
+    //% laj.min=1 index.max=90 index.defl=1 forward.defl=2.2
     //% subcategory=Sensor
-    function fourInfraredGrab(laji: number) {
-        /* "抓起垃圾编号$laji" */
+    function fourInfraredGrab(index: number) {
+        /* "抓起垃圾编号$index" */
         // follow first to be stable
         let forward = 2.3
         fourInfraredFollow(1.5)
-        if (laji == 1) { //battery narrow
+        if (index == 1) { //battery narrow
             // arm down
             setPwmServo(startbit_servorange.range1, 1, 180, 300)
             // claw open
@@ -2332,7 +2332,7 @@ namespace StartbitV2 {
             // claw close
             setPwmServo(startbit_servorange.range1, 4, 70, 300)
             basic.pause(500)
-        } else if (laji == 2) { //battery wide
+        } else if (index == 2) { //battery wide
             // arm down
             setPwmServo(startbit_servorange.range1, 1, 180, 300)
             // claw open
@@ -2343,7 +2343,7 @@ namespace StartbitV2 {
             // claw close
             setPwmServo(startbit_servorange.range1, 4, 65, 300)
             basic.pause(500)
-        } else if (laji == 3) { //cup
+        } else if (index == 3) { //cup
             // arm down
             setPwmServo(startbit_servorange.range1, 1, 170, 300)
             // claw open
@@ -2373,18 +2373,18 @@ namespace StartbitV2 {
         fourInfraredFollow(10)
     }
 
-    //% weight=15 blockId=fourInfraredDrop block="hwFang$laji"
-    //% laji.min=1 laji.max=4 laji.defl=1
+    //% weight=15 blockId=fourInfraredDrop block="hwFang$index"
+    //% index.min=1 index.max=4 index.defl=1
     //% subcategory=Sensor
-    function fourInfraredDrop(laji: number) {
-        /* "放下垃圾编号$laji" */
+    function fourInfraredDrop(index: number) {
+        /* "放下垃圾编号$index" */
         let forward = 0.9
         // move closer
         moveForTime(100, 100, forward)
         // arm down
-        if (laji == 1 || laji == 2) {
+        if (index == 1 || index == 2) {
             setPwmServo(startbit_servorange.range1, 1, 180, 800)
-        } else if (laji == 3) {
+        } else if (index == 3) {
             setPwmServo(startbit_servorange.range1, 1, 170, 800)
         } else {
             setPwmServo(startbit_servorange.range1, 1, 160, 800)
@@ -2580,11 +2580,11 @@ function lu (fx: number) {
     StartbitV2.startbit_setMotorSpeed(0, 0)
     basic.pause(20)
 }
-function fang (laji: number) {
+function fang (index: number) {
     dong(100, 100, 0.9)
-    if (laji == 1 || laji == 2) {
+    if (index == 1 || index == 2) {
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 800)
-    } else if (laji == 3) {
+    } else if (index == 3) {
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 170, 800)
     } else {
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 160, 800)
@@ -2598,23 +2598,23 @@ function fang (laji: number) {
     dong(-100, -100, 0.9)
     find()
 }
-function zhua (laji: number) {
+function zhua (index: number) {
     zhi(1.5)
-    if (laji == 1) {
+    if (index == 1) {
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 300)
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
         basic.pause(500)
         zhi(0.8)
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 75, 300)
         basic.pause(500)
-    } else if (laji == 2) {
+    } else if (index == 2) {
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 300)
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
         basic.pause(500)
         zhi(0.8)
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 70, 300)
         basic.pause(500)
-    } else if (laji == 3) {
+    } else if (index == 3) {
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 170, 300)
         StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
         basic.pause(500)
