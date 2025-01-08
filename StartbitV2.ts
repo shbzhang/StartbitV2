@@ -2680,5 +2680,6 @@ let s = 0
 s = 150
 m = 400
 StartbitV2.startbit_Init()
-StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 800)
+StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 300)
+basic.pause(500)
 */
