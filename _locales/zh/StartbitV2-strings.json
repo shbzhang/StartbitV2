@@ -202,6 +202,6 @@
 	"StartbitV2.singleGrayStopAtBlack|block":"搜寻 |中值 %median",
 	"StartbitV2.singleGrayGrab|block":"舵机抬起 |编号 %index |中值 %median",
 	"StartbitV2.singleGrayDrop|block":"舵机降低 |编号 %index |中值 %median",
-	"StartbitV2.moveForTime|block":"设置|电机1速度 %speed1|和电机2速度 %speed2|时间 %time"，
+	"StartbitV2.moveForTime|block":"设置|电机1速度 %speed1|和电机2速度 %speed2|时间 %time",
 	"StartbitV2.checkLabel|block":"检查标记"
 }
