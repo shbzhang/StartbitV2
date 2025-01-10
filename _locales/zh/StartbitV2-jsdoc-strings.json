@@ -79,5 +79,15 @@
 	"StartbitV2.startbit_MP3_BUTTON":"播放，暂停，上一首，下一首，",
 	"StartbitV2.startbit_MP3_VOL":"调整播放音量，需要在播放前设置，范围0-30",
 	"StartbitV2.startbit_MP3_SINGLE_LOOP":"开启或者关闭单曲循环，需要在播放后设置",
-	"StartbitV2.startbit_MP3_PLAY_NUM":"播放指定序号的歌曲，歌曲需要放在sd卡里，名称为MP3的文件夹里，并且歌曲名称以4位数字开头，如0001，0100，1000"
+	"StartbitV2.startbit_MP3_PLAY_NUM":"播放指定序号的歌曲，歌曲需要放在sd卡里，名称为MP3的文件夹里，并且歌曲名称以4位数字开头，如0001，0100，1000",
+
+	"StartbitV2.isCrossroad":"光电传感器检测到异常状态",
+	"StartbitV2.calibrateSensor":"连续读取光电传感器数值，计算灰度中值",
+	"StartbitV2.singleGrayFollow":"光电传感器持续运行",
+	"StartbitV2.singleGrayCrossroads":"光电传感器停止运行",
+	"StartbitV2.singleGrayStopAtBlack":"传感器中值搜寻",
+	"StartbitV2.singleGrayGrab":"传感器感应升高",
+	"StartbitV2.singleGrayDrop":"传感器感应下落",
+	"StartbitV2.moveForTime":"定时运行",
+	"StartbitV2.checkLable":"标记感应"
 }
