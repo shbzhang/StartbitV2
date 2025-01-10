@@ -96,7 +96,145 @@ namespace StartbitV2 {
                 break;
         }
     }
-	    
+
+    /*
+    function read() {
+        zz = StartbitV2.startbit_line_followers(StartbitV2.startbit_LineFollowerSensors.S1, StartbitV2.startbit_LineColor.Black)
+        z = StartbitV2.startbit_line_followers(StartbitV2.startbit_LineFollowerSensors.S2, StartbitV2.startbit_LineColor.Black)
+        y = StartbitV2.startbit_line_followers(StartbitV2.startbit_LineFollowerSensors.S3, StartbitV2.startbit_LineColor.Black)
+        yy = StartbitV2.startbit_line_followers(StartbitV2.startbit_LineFollowerSensors.S4, StartbitV2.startbit_LineColor.Black)
+    }
+    function dong (speed1: number, speed2: number, time: number) {
+        StartbitV2.startbit_setMotorSpeed(speed1, speed2)
+        basic.pause(time * 1000)
+        StartbitV2.startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+    function find () {
+        StartbitV2.startbit_setMotorSpeed(100, 100)
+        read()
+        while (!(z) && !(y)) {
+            read()
+        }
+        StartbitV2.startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+    function zhi (time: number) {
+        kai = control.millis()
+        while (control.millis() - kai < time * 1000) {
+            read()
+            if (!(zz) && !(yy)) {
+                if (z && y) {
+                    StartbitV2.startbit_setMotorSpeed(100, 100)
+                } else if (z && !(y)) {
+                    StartbitV2.startbit_setMotorSpeed(100, 0)
+                } else if (!(z) && y) {
+                    StartbitV2.startbit_setMotorSpeed(0, 100)
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        StartbitV2.startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+    function lu (direct: number) {
+        StartbitV2.startbit_setMotorSpeed(100, 100)
+        basic.pause(280)
+        StartbitV2.startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+        if (direct == 1) {
+            StartbitV2.startbit_setMotorSpeed(100, -100)
+            basic.pause(600)
+            while (StartbitV2.startbit_line_followers(StartbitV2.startbit_LineFollowerSensors.S3, StartbitV2.startbit_LineColor.White)) {
+            	
+            }
+        } else if (direct == 2) {
+        	
+        } else if (direct == 3) {
+            StartbitV2.startbit_setMotorSpeed(-100, 100)
+            basic.pause(600)
+            while (StartbitV2.startbit_line_followers(StartbitV2.startbit_LineFollowerSensors.S2, StartbitV2.startbit_LineColor.White)) {
+            	
+            }
+        } else {
+            StartbitV2.startbit_setMotorSpeed(100, -100)
+            basic.pause(1800)
+            while (StartbitV2.startbit_line_followers(StartbitV2.startbit_LineFollowerSensors.S3, StartbitV2.startbit_LineColor.White)) {
+                StartbitV2.startbit_setMotorSpeed(100, -100)
+            }
+        }
+        StartbitV2.startbit_setMotorSpeed(0, 0)
+        basic.pause(20)
+    }
+    function fang (index: number) {
+        dong(100, 100, 0.9)
+        if (index == 1 || index == 2) {
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 800)
+        } else if (index == 3) {
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 170, 800)
+        } else {
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 160, 800)
+        }
+        basic.pause(1000)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+        basic.pause(500)
+        dong(-100, -100, 0.9)
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 500)
+        basic.pause(700)
+        dong(-100, -100, 0.9)
+        find()
+    }
+    
+    function zhua (index: number) {
+        zhi(1.5)
+        if (index == 1) {
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 300)
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            zhi(0.8)
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 75, 300)
+            basic.pause(500)
+        } else if (index == 2) {
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 300)
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            zhi(0.8)
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 70, 300)
+            basic.pause(500)
+        } else if (index == 3) {
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 170, 300)
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            zhi(0.8)
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 45, 300)
+            basic.pause(500)
+        } else {
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 160, 300)
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+            basic.pause(500)
+            zhi(0.8)
+            StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 55, 300)
+            basic.pause(500)
+        }
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 800)
+        basic.pause(1000)
+        zhi(10)
+    }
+    let kai = 0
+    let yy = false
+    let y = false
+    let z = false
+    let zz = false
+    let w = 0
+    zz = true
+    z = true
+    y = true
+    yy = true
+    */
+    
     export enum startbit_PinIOStatus {
         //% block="Low"
         Low = 0x00,
