@@ -2105,14 +2105,29 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 
-    //% weight=26 blockId=singleGrayGrab block="gdZhua lj $index m $median"
-    //% index.min=1 index.max=4 index.defl=1 median.defl=400
+    //% weight=26 blockId=singleGrayGrab block="gdZhua forward $forward arm $arm claw $claw m $median"
+    //% forward.defl=0.8 arm.defl=180 claw.defl=75 median.defl=400
     //% subcategory=Sensor
-    export function singleGrayGrab(index: number, median: number) {
-        /* "抓起垃圾编号$index，中值$median" */
+    export function singleGrayGrab(forward: number, arm: number, claw: number, median: number) {
+        /* "抓起垃圾前进$forward, 角度$angle，中值$median" */
         // follow first to be stable
-        let forward = 2.3
         singleGrayFollow(1.5, median)
+	// arm down
+	setPwmServo(startbit_servorange.range1, 1, arm, 300)
+	// claw open
+	setPwmServo(startbit_servorange.range1, 4, 0, 300)
+	basic.pause(500)
+	// move closer
+	singleGrayFollow(forward, median)
+	// claw close
+	setPwmServo(startbit_servorange.range1, 4, claw, 300)
+	basic.pause(500)
+	// arm up
+        setPwmServo(startbit_servorange.range1, 1, 35, 800)
+        basic.pause(1000)
+        // to crossroad
+        singleGrayFollow(10, median)
+	/*
         if (index == 1) { //battery narrow
             // arm down
             setPwmServo(startbit_servorange.range1, 1, 180, 300)
@@ -2158,11 +2173,7 @@ namespace StartbitV2 {
             setPwmServo(startbit_servorange.range1, 4, 55, 300)
             basic.pause(500)
         }
-        // arm up
-        setPwmServo(startbit_servorange.range1, 1, 35, 800)
-        basic.pause(1000)
-        // to crossroad
-        singleGrayFollow(10, median)
+	*/
     }
 
     //% weight=24 blockId=checkLabel block="biao"
@@ -2179,22 +2190,15 @@ namespace StartbitV2 {
         }
     }
 
-    //% weight=25 blockId=singleGrayDrop block="gdFang lj $index m $median"
+    //% weight=25 blockId=singleGrayDrop block="gdFang arm $arm m $median"
     //% index.min=1 index.max=4 index.defl=1 median.defl=400
     //% subcategory=Sensor
-    export function singleGrayDrop(index: number, median: number) {
-        /* "放下垃圾编号$index" */
-	let forward = 0.9
+    export function singleGrayDrop(arm: number, median: number) {
+        /* "放下垃圾到角度$arm" */
         // move closer
-        moveForTime(100, 100, forward)
+        moveForTime(100, 100, 0.9)
         // arm down
-        if (index == 1 || index == 2) {
-            setPwmServo(startbit_servorange.range1, 1, 180, 800)
-        } else if (index == 3) {
-            setPwmServo(startbit_servorange.range1, 1, 170, 800)
-        } else {
-            setPwmServo(startbit_servorange.range1, 1, 160, 800)
-        }
+	setPwmServo(startbit_servorange.range1, 1, arm, 800)
         basic.pause(1000)
         // claw open
         setPwmServo(startbit_servorange.range1, 4, 0, 300)
@@ -2208,6 +2212,15 @@ namespace StartbitV2 {
         moveForTime(-100, -100, 0.8)
         // back to line
         singleGrayStopAtBlack(median)
+	/*	    
+        if (index == 1 || index == 2) {
+            setPwmServo(startbit_servorange.range1, 1, 180, 800)
+        } else if (index == 3) {
+            setPwmServo(startbit_servorange.range1, 1, 170, 800)
+        } else {
+            setPwmServo(startbit_servorange.range1, 1, 160, 800)
+        }
+	*/
     }
 
     //% weight=24 blockId=moveForTime blockGap=50 block="dong $speed1 $speed2 $time"
@@ -2644,32 +2657,6 @@ function biao(): number {
 	    return 2
 	}
 }
-function ce () {
-    da = -100
-    xiao = 10000
-    kai = control.millis()
-    StartbitV2.startbit_setMotorSpeed(0, 100)
-    while (control.millis() - kai < 10000) {
-        du = pins.analogReadPin(AnalogPin.P2)
-        if (du > da) {
-            da = du
-        }
-        if (du < xiao) {
-            xiao = du
-        }
-    }
-    StartbitV2.startbit_setMotorSpeed(0, 0)
-    basic.pause(20)
-    for (let index = 0; index < 4; index++) {
-        basic.showNumber((da + xiao) / 2)
-        basic.pause(1500)
-        basic.showNumber((da - xiao) / 4)
-        basic.pause(1500)
-    }
-}
-let du = 0
-let xiao = 0
-let da = 0
 let e = 0
 let kai = 0
 let se = 0
