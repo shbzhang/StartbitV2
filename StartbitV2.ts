@@ -1999,11 +1999,11 @@ namespace StartbitV2 {
     }
 
     //% weight=29 blockId=singleGrayFollow block="gdZhi t $time m $median"
-    //% time.defl=10 median.defl=400
+    //% time.defl=10 median.defl=130
     //% subcategory=Sensor
     export function singleGrayFollow(time: number, median: number) {
 	/* "巡线$time秒，中值$median" */
-        let kp = 1
+        let kp = 2.5
 	let error = 0
         let speed = 100
         let speed1 = 0
@@ -2047,7 +2047,7 @@ namespace StartbitV2 {
     }
 
     //% weight=28 blockId=singleGrayCrossroads block="gdLu d $direct m $median"
-    //% direct.defl=1 median.defl=400
+    //% direct.defl=1 median.defl=130
     //% subcategory=Sensor
     export function singleGrayCrossroads(direct: number, median: number) {
         /* "路口向$direct 中值$median" */
@@ -2094,7 +2094,7 @@ namespace StartbitV2 {
     }
 
     //% weight=27 blockId=singleGrayStopAtBlack block="gdZhaoHei m $median"
-    //% median.defl=400
+    //% median.defl=130
     //% subcategory=Sensor
     export function singleGrayStopAtBlack(median: number) {
         /* "前进至黑线 中值$median" */
@@ -2106,7 +2106,7 @@ namespace StartbitV2 {
     }
 
     //% weight=26 blockId=singleGrayGrab block="gdZhua forward $forward arm $arm claw $claw m $median"
-    //% forward.defl=0.8 arm.defl=180 claw.defl=75 median.defl=400
+    //% forward.defl=0.8 arm.defl=180 claw.defl=75 median.defl=130
     //% subcategory=Sensor
     export function singleGrayGrab(forward: number, arm: number, claw: number, median: number) {
         /* "抓起垃圾前进$forward, 角度$angle，中值$median" */
@@ -2176,10 +2176,11 @@ namespace StartbitV2 {
 	*/
     }
 
-    //% weight=24 blockId=checkLabel block="biao"
+    //% weight=24 blockId=checkLabel block="biao m $median"
+    //% median.defl=130
     //% subcategory=Sensor
-    export function checkLabel(): number {
-        if (pins.analogReadPin(AnalogReadWritePin.P2) > 400) {
+    export function checkLabel(median: number): number {
+        if (pins.analogReadPin(AnalogReadWritePin.P2) > median) {
             StartbitV2.startbit_setMotorSpeed(100, 0)
             basic.pause(300)
             return 1
@@ -2191,7 +2192,7 @@ namespace StartbitV2 {
     }
 
     //% weight=25 blockId=singleGrayDrop block="gdFang arm $arm m $median"
-    //% arm.defl=180 median.defl=400
+    //% arm.defl=180 median.defl=130
     //% subcategory=Sensor
     export function singleGrayDrop(arm: number, median: number) {
         /* "放下垃圾到角度$arm" */
@@ -2518,6 +2519,10 @@ namespace StartbitV2 {
         basic.pause(20)
     }
 }
+
+
+
+
 /*
 function dong (m1: number, m2: number, time: number) {
     StartbitV2.startbit_setMotorSpeed(m1, m2)
@@ -2555,7 +2560,7 @@ function zhi (time: number) {
                 break;
             }
         }
-        StartbitV2.startbit_setMotorSpeed(Math.constrain(100 - e, -100, 100), Math.constrain(100 + e, -100, 100))
+        StartbitV2.startbit_setMotorSpeed(Math.constrain(100 - e * 2.5, -100, 100), Math.constrain(100 + e * 2.5, -100, 100))
     }
     StartbitV2.startbit_setMotorSpeed(0, 0)
     basic.pause(20)
@@ -2593,24 +2598,6 @@ function lu (fx: number) {
     StartbitV2.startbit_setMotorSpeed(0, 0)
     basic.pause(20)
 }
-function fang (index: number) {
-    dong(100, 100, 0.9)
-    if (index == 1 || index == 2) {
-        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 800)
-    } else if (index == 3) {
-        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 170, 800)
-    } else {
-        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 160, 800)
-    }
-    basic.pause(1000)
-    StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
-    basic.pause(500)
-    dong(-100, -100, 0.9)
-    StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 300)
-    basic.pause(500)
-    dong(-100, -100, 0.9)
-    find()
-}
 function zhua (index: number) {
     zhi(1.5)
     if (index == 1) {
@@ -2646,10 +2633,28 @@ function zhua (index: number) {
     basic.pause(1000)
     zhi(10)
 }
+function fang (index: number) {
+    dong(100, 100, 0.9)
+    if (index == 1 || index == 2) {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 180, 800)
+    } else if (index == 3) {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 170, 800)
+    } else {
+        StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 160, 800)
+    }
+    basic.pause(1000)
+    StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+    basic.pause(500)
+    dong(-100, -100, 0.9)
+    StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 300)
+    basic.pause(500)
+    dong(-100, -100, 0.9)
+    find()
+}
 function biao(): number {
-	if (pins.analogReadPin(AnalogPin.P2) > 400) {
+	if (pins.analogReadPin(AnalogPin.P2) > m) {
 	    StartbitV2.startbit_setMotorSpeed(100, 0)
-	    basic.pause(300)
+	    basic.pause(600)
 	    return 1
 	} else {
 	    StartbitV2.startbit_setMotorSpeed(0, 100)
@@ -2664,9 +2669,11 @@ let white = 0
 let black = 0
 let m = 0
 let s = 0
-s = 150
-m = 400
+let w = 0
+s = 60
+m = 130
 StartbitV2.startbit_Init()
 StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 1, 35, 300)
-basic.pause(500)
+StartbitV2.setPwmServo(StartbitV2.startbit_servorange.range1, 4, 0, 300)
+basic.pause(800)
 */
