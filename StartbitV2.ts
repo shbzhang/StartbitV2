@@ -2191,7 +2191,7 @@ namespace StartbitV2 {
     }
 
     //% weight=25 blockId=singleGrayDrop block="gdFang arm $arm m $median"
-    //% index.min=1 index.max=4 index.defl=1 median.defl=400
+    //% arm.defl=180 median.defl=400
     //% subcategory=Sensor
     export function singleGrayDrop(arm: number, median: number) {
         /* "放下垃圾到角度$arm" */
