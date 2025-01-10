@@ -2204,12 +2204,12 @@ namespace StartbitV2 {
         setPwmServo(startbit_servorange.range1, 4, 0, 300)
         basic.pause(500)
         // backward a little
-        moveForTime(-100, -100, forward)
+        moveForTime(-100, -100, 0.9)
         // arm up
         setPwmServo(startbit_servorange.range1, 1, 35, 500)
         basic.pause(700)
         // backward
-        moveForTime(-100, -100, 0.8)
+        moveForTime(-100, -100, 0.9)
         // back to line
         singleGrayStopAtBlack(median)
 	/*	    
